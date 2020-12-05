@@ -23,13 +23,11 @@ const render = (container, template, place = `beforeend`) => {
 
 const headerElement = document.querySelector(`.trip-main`);
 render(headerElement, createInfoTemplate(events), `afterbegin`);
+render(headerElement, createNewButtonTemplate());
 
 const controlsElement = headerElement.querySelector(`.trip-controls`);
+render(controlsElement, createTabsTemplate());
 render(controlsElement, createFiltersTemplate());
-render(controlsElement, createNewButtonTemplate(), `afterend`);
-
-const switchHeadingElement = controlsElement.querySelector(`h2:first-child`);
-render(switchHeadingElement, createTabsTemplate(), `afterend`);
 
 const infoElement = headerElement.querySelector(`.trip-info`);
 render(infoElement, createCostTemplate(events));
