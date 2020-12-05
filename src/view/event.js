@@ -19,6 +19,23 @@ const formatDuration = (startInstance, finishInstance) => {
   return `${days}D ${hourStr} ${minuteStr}`;
 };
 
+const createOfferItem = (template, offer) => {
+  return `${template}<li class="event__offer">
+    <span class="event__offer-title">${offer.name}</span>
+    &nbsp;&plus;&euro;&nbsp;&nbsp;<span class="event__offer-price">${offer.price} </span>
+  </li>`;
+};
+
+const createOffersList = (offers) => {
+  if (!offers.length) {
+    return ``;
+  }
+
+  return `<h4 class="visually-hidden">Offers:</h4><ul class="event__selected-offers">
+    ${offers.filter((offer) => offer.isChecked).reduce(createOfferItem, ``)}
+  </ul>`;
+};
+
 export const createEventTemplate = ({
   type,
   destination,
@@ -61,12 +78,7 @@ export const createEventTemplate = ({
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${price}</span>
       </p>
-      ${offers.length ? `<h4 class="visually-hidden">Offers:</h4><ul class="event__selected-offers">
-        ${offers.filter((offer) => offer.isChecked).reduce((template, offer) => `${template}<li class="event__offer">
-          <span class="event__offer-title">${offer.name}</span>
-          &nbsp;&plus;&euro;&nbsp;&nbsp;<span class="event__offer-price">${offer.price} </span>
-        </li>`, ``)}
-      </ul>` : ``}
+      ${createOffersList(offers)}
       <button class="event__favorite-btn ${isFavorite ? `event__favorite-btn--active` : ``}" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">

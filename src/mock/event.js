@@ -5,16 +5,17 @@ import {eventTypes} from './event-types';
 import {destinations} from './destinations';
 
 const DURATION_RANGE = [10, 60 * 24 * 3]; // для выбора случайной длительности от 10 мин. до 3 сут.
-let tempTime = dayjs().add(getRandomInt(...DURATION_RANGE), `minute`);
+const MINUTE_NAME = `minute`;
+let tempTime = dayjs().add(getRandomInt(...DURATION_RANGE), MINUTE_NAME);
 let counter = 0;
 
 export const generateEvent = () => {
   // Начало следующего мероприятия совпадает с окончанием ранее сгенерированного
   // Поэтому сохраняем значение из счетчика времени
-  const startTime = tempTime;
+  const startTime = tempTime.toISOString();
 
   // Добавляем к счетчику времени случайную продолжительность
-  tempTime = tempTime.add(getRandomInt(...DURATION_RANGE), `minute`);
+  tempTime = tempTime.add(getRandomInt(...DURATION_RANGE), MINUTE_NAME);
 
   const typeName = getRandomItem(EVENT_TYPES);
   const cityName = getRandomItem(CITY_NAMES);
@@ -27,7 +28,7 @@ export const generateEvent = () => {
     id: ++counter,
     type,
     destination: destinations.find(({city}) => city === cityName),
-    startTime: startTime.toISOString(),
+    startTime,
     finishTime: tempTime.toISOString(),
     isFavorite: Boolean(getRandomInt()),
     price: getRandomInt(...PRICE_RANGE)
