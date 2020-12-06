@@ -32,3 +32,30 @@ export const getRandomItems = (list, length = 0) => {
 // Выводит число с ведущим нулём
 const TWO_DIGIT = 10;
 export const formatWithLead0 = (num) => `${num < TWO_DIGIT ? 0 : ``}${num}`;
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
+export const renderElement = (container, element, place = RenderPosition.BEFOREEND) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const renderTemplate = (container, template, place = RenderPosition.BEFOREEND) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template.trim();
+
+  return newElement.firstChild;
+};

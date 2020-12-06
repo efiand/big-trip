@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
+import {createElement} from '../utils.js';
 
-export const createInfoTemplate = (events) => {
+const createInfoTemplate = (events) => {
   const cities = Array.from(new Set(events.map((eventData) => {
     return eventData.destination.city;
   })));
@@ -21,3 +22,26 @@ export const createInfoTemplate = (events) => {
     </section>
   `;
 };
+
+export default class InfoView {
+  constructor(events) {
+    this._events = events;
+  }
+
+  getTemplate() {
+    return createInfoTemplate(this._events);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    console.log(this.getTemplate());
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

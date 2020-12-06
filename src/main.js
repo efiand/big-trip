@@ -1,5 +1,5 @@
 import {getRandomInt} from './utils';
-import {createInfoTemplate} from './view/info';
+import InfoView from './view/info';
 import {createCostTemplate} from './view/cost';
 import {createTabsTemplate} from './view/tabs';
 import {createFiltersTemplate} from './view/filters';
@@ -12,35 +12,33 @@ import {generateEvent} from './mock/event';
 import {eventTypes} from './mock/event-types';
 import {destinations} from './mock/destinations';
 import {CITY_NAMES} from './mock/const';
+import {renderTemplate, renderElement, RenderPosition} from './utils.js';
 
 const EVENTS_RANGE = [15, 20];
 const eventsCount = getRandomInt(...EVENTS_RANGE);
 const events = new Array(eventsCount).fill().map(generateEvent);
 
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 const headerElement = document.querySelector(`.trip-main`);
-render(headerElement, createInfoTemplate(events), `afterbegin`);
-render(headerElement, createNewButtonTemplate());
+console.log(new InfoView(events).getElement());
+const infoComponent = new InfoView(events);
+const infoElement = infoComponent.getElement();
+renderTemplate(infoElement, createCostTemplate(events));
+renderElement(headerElement, infoElement, RenderPosition.AFTERBEGIN);
+renderTemplate(headerElement, createNewButtonTemplate());
 
 const controlsElement = headerElement.querySelector(`.trip-controls`);
-render(controlsElement, createTabsTemplate());
-render(controlsElement, createFiltersTemplate());
-
-const infoElement = headerElement.querySelector(`.trip-info`);
-render(infoElement, createCostTemplate(events));
+renderTemplate(controlsElement, createTabsTemplate());
+renderTemplate(controlsElement, createFiltersTemplate());
 
 const eventsElement = document.querySelector(`.trip-events`);
-render(eventsElement, createSortTemplate());
+renderTemplate(eventsElement, createSortTemplate());
 
-render(eventsElement, createEventsListTemplate(eventsCount));
+renderTemplate(eventsElement, createEventsListTemplate(eventsCount));
 if (eventsCount) {
   const listElement = eventsElement.querySelector(`.trip-events__list`);
 
   events.forEach((eventData, i) => {
-    render(listElement, i ? createEventTemplate(eventData) : createEventEditTemplate({
+    renderTemplate(listElement, i ? createEventTemplate(eventData) : createEventEditTemplate({
       eventData,
       eventTypes,
       destinations,
