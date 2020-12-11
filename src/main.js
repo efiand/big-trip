@@ -18,15 +18,15 @@ const EVENTS_RANGE = [15, 20];
 const eventsCount = getRandomInt(...EVENTS_RANGE);
 const events = new Array(eventsCount).fill().map(generateEvent);
 
-const headerElement = document.querySelector(`.trip-main`);
+const headerMainElement = document.querySelector(`.trip-main`);
 console.log(new InfoView(events).getElement());
 const infoComponent = new InfoView(events);
 const infoElement = infoComponent.getElement();
 renderTemplate(infoElement, createCostTemplate(events));
-renderElement(headerElement, infoElement, RenderPosition.AFTERBEGIN);
-renderTemplate(headerElement, createNewButtonTemplate());
+renderElement(headerMainElement, infoElement, RenderPosition.AFTERBEGIN);
+renderTemplate(headerMainElement, createNewButtonTemplate());
 
-const controlsElement = headerElement.querySelector(`.trip-controls`);
+const controlsElement = headerMainElement.querySelector(`.trip-controls`);
 renderTemplate(controlsElement, createTabsTemplate());
 renderTemplate(controlsElement, createFiltersTemplate());
 
