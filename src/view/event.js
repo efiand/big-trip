@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {capitalize, formatWithLead0} from '../utils';
+import {capitalize, formatWithLead0, createElement} from '../utils';
 
 const formatDuration = (startInstance, finishInstance) => {
   const minutes = finishInstance.diff(startInstance, `minute`);
@@ -99,3 +99,25 @@ export const createEventTemplate = ({
     </li>
   `;
 };
+
+export default class EventView {
+  constructor(eventData) {
+    this._event = eventData;
+  }
+
+  getTemplate() {
+    return createEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

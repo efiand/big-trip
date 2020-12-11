@@ -1,3 +1,5 @@
+import {RenderPosition} from './const';
+
 export const getRandomInt = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -33,24 +35,16 @@ export const getRandomItems = (list, length = 0) => {
 const TWO_DIGIT = 10;
 export const formatWithLead0 = (num) => `${num < TWO_DIGIT ? 0 : ``}${num}`;
 
-export const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
-};
-
+const renderPositions = Object.values(RenderPosition);
 export const renderElement = (container, element, place = RenderPosition.BEFOREEND) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
+  if (renderPositions.indexOf(place) > -1) {
+    container.insertAdjacentElement(place, element);
   }
 };
-
 export const renderTemplate = (container, template, place = RenderPosition.BEFOREEND) => {
-  container.insertAdjacentHTML(place, template);
+  if (renderPositions.indexOf(place) > -1) {
+    container.insertAdjacentHTML(place, template);
+  }
 };
 
 export const createElement = (template) => {

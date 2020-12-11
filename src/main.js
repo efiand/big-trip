@@ -1,18 +1,20 @@
-import {getRandomInt} from './utils';
 import InfoView from './view/info';
 import CostView from './view/cost';
-import {createTabsTemplate} from './view/tabs';
-import {createFiltersTemplate} from './view/filters';
-import {createNewButtonTemplate} from './view/new-button';
-import {createSortTemplate} from './view/sort';
-import {createEventsListTemplate} from './view/events-list';
-import {createEventTemplate} from './view/event';
-import {createEventEditTemplate} from './view/event-edit';
+import TabsView from './view/tabs';
+import FiltersView from './view/filters';
+import NewButtonView from './view/new-button';
+import SortingsView from './view/sort';
+import EventsListView from './view/events-list';
+import EventView from './view/event';
+import EventEditView from './view/event-edit';
+
 import {generateEvent} from './mock/event';
 import {eventTypes} from './mock/event-types';
 import {destinations} from './mock/destinations';
 import {CITY_NAMES} from './mock/const';
-import {renderTemplate, renderElement, RenderPosition} from './utils.js';
+
+import {RenderPosition} from './const';
+import {getRandomInt, renderElement} from './utils';
 
 const EVENTS_RANGE = [15, 20];
 const eventsCount = getRandomInt(...EVENTS_RANGE);
@@ -22,26 +24,26 @@ const headerMainElement = document.querySelector(`.trip-main`);
 const infoComponent = new InfoView(events);
 const infoElement = infoComponent.getElement();
 renderElement(infoElement, new CostView(events).getElement());
+renderElement(headerMainElement, new NewButtonView().getElement());
 renderElement(headerMainElement, infoElement, RenderPosition.AFTERBEGIN);
-renderTemplate(headerMainElement, createNewButtonTemplate());
 
 const controlsElement = headerMainElement.querySelector(`.trip-controls`);
-renderTemplate(controlsElement, createTabsTemplate());
-renderTemplate(controlsElement, createFiltersTemplate());
+renderElement(controlsElement.querySelector(`h2`), new TabsView().getElement(), RenderPosition.AFTEREND);
+renderElement(controlsElement, new FiltersView().getElement());
 
 const eventsElement = document.querySelector(`.trip-events`);
-renderTemplate(eventsElement, createSortTemplate());
+renderElement(eventsElement, new SortingsView().getElement());
 
-renderTemplate(eventsElement, createEventsListTemplate(eventsCount));
+renderElement(eventsElement, new EventsListView(eventsCount).getElement());
 if (eventsCount) {
   const listElement = eventsElement.querySelector(`.trip-events__list`);
 
   events.forEach((eventData, i) => {
-    renderTemplate(listElement, i ? createEventTemplate(eventData) : createEventEditTemplate({
+    renderElement(listElement, (i ? new EventView(eventData) : new EventEditView({
       eventData,
       eventTypes,
       destinations,
       cities: CITY_NAMES
-    }));
+    })).getElement());
   });
 }

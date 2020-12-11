@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {createElement} from '../utils.js';
+import {createElement} from '../utils';
 
 const createInfoTemplate = (events) => {
   const cities = Array.from(new Set(events.map((eventData) => {

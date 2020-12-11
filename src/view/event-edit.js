@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {capitalize} from '../utils';
+import {capitalize, createElement} from '../utils';
 
 const currentTime = dayjs().toISOString();
 
@@ -63,7 +63,7 @@ const createPhotosList = (photos) => photos.reduce((template, photo) => {
   return `${template}<img class="event__photo" src="${photo}" alt="Event photo">`;
 }, ``);
 
-export const createEventEditTemplate = ({eventData = null, eventTypes, destinations, cities}) => {
+const createEventEditTemplate = ({eventData = null, eventTypes, destinations, cities}) => {
   if (!eventData) {
     eventData = getDefaultData(eventTypes[0], destinations[0]);
   }
@@ -170,3 +170,25 @@ export const createEventEditTemplate = ({eventData = null, eventTypes, destinati
     </li>
   `;
 };
+
+export default class EventEditView {
+  constructor(payload) {
+    this._payload = payload;
+  }
+
+  getTemplate() {
+    return createEventEditTemplate(this._payload);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

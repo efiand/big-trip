@@ -1,23 +1,57 @@
-export const createFiltersTemplate = () => {
+import {createElement, capitalize} from '../utils';
+import {FILTERS} from '../const';
+
+const defaultFilter = FILTERS[0];
+
+const createListMarkup = (activeFilter) => FILTERS.reduce((markup, filter) => {
+  const title = capitalize(filter);
+  const isActive = filter === activeFilter;
+
   return `
-    <h2 class="visually-hidden">Filter events</h2>
+    ${markup}
+    <div class="trip-filters__filter">
+      <input
+        id="filter-${filter}"
+        class="trip-filters__filter-input visually-hidden"
+        type="radio"
+        name="trip-filter"
+        value="${filter}"
+        ${isActive ? `checked` : ``}
+      />
+      <label class="trip-filters__filter-label" for="filter-${filter}">
+        ${title}
+      </label>
+    </div>
+  `;
+}, ``);
+
+const createFiltersTemplate = (activeFilter) => {
+  return `
     <form class="trip-filters" action="#" method="get">
-      <div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-        <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-      </div>
-
-      <div class="trip-filters__filter">
-        <input id="filter-future" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="future">
-        <label class="trip-filters__filter-label" for="filter-future">Future</label>
-      </div>
-
-      <div class="trip-filters__filter">
-        <input id="filter-past" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="past">
-        <label class="trip-filters__filter-label" for="filter-past">Past</label>
-      </div>
-
+      ${createListMarkup(activeFilter)}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>
   `;
 };
+
+export default class FiltersView {
+  constructor(activeFilter = defaultFilter) {
+    this._activeFilter = activeFilter;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate(this._activeFilter);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
