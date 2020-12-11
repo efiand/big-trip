@@ -1,6 +1,6 @@
 import {getRandomInt} from './utils';
 import InfoView from './view/info';
-import {createCostTemplate} from './view/cost';
+import CostView from './view/cost';
 import {createTabsTemplate} from './view/tabs';
 import {createFiltersTemplate} from './view/filters';
 import {createNewButtonTemplate} from './view/new-button';
@@ -19,10 +19,9 @@ const eventsCount = getRandomInt(...EVENTS_RANGE);
 const events = new Array(eventsCount).fill().map(generateEvent);
 
 const headerMainElement = document.querySelector(`.trip-main`);
-console.log(new InfoView(events).getElement());
 const infoComponent = new InfoView(events);
 const infoElement = infoComponent.getElement();
-renderTemplate(infoElement, createCostTemplate(events));
+renderElement(infoElement, new CostView(events).getElement());
 renderElement(headerMainElement, infoElement, RenderPosition.AFTERBEGIN);
 renderTemplate(headerMainElement, createNewButtonTemplate());
 

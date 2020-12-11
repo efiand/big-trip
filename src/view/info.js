@@ -37,7 +37,6 @@ export default class InfoView {
       this._element = createElement(this.getTemplate());
     }
 
-    console.log(this.getTemplate());
     return this._element;
   }
 
