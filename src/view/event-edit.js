@@ -64,7 +64,8 @@ const createPhotosList = (photos) => photos.reduce((template, photo) => {
 }, ``);
 
 const createEventEditTemplate = ({eventData = null, eventTypes, destinations, cities}) => {
-  if (!eventData) {
+  const addMode = !eventData;
+  if (addMode) {
     eventData = getDefaultData(eventTypes[0], destinations[0]);
   }
   const {id, type, destination, startTime, finishTime, price} = eventData;
@@ -149,7 +150,14 @@ const createEventEditTemplate = ({eventData = null, eventTypes, destinations, ci
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">
+            ${addMode ? `Cancel` : `Delete`}
+          </button>
+          ${addMode ? `` : `
+            <button class="event__rollup-btn" type="button">
+              <span class="visually-hidden">Open event</span>
+            </button>
+          `}
         </header>
         <section class="event__details">
           ${offers.length ? `<section class="event__section  event__section--offers">

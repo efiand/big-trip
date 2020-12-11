@@ -5,6 +5,7 @@ import FiltersView from './view/filters';
 import NewButtonView from './view/new-button';
 import SortingsView from './view/sort';
 import EventsListView from './view/events-list';
+import NoEventsView from './view/no-events';
 import EventView from './view/event';
 import EventEditView from './view/event-edit';
 
@@ -32,11 +33,11 @@ renderElement(controlsElement.querySelector(`h2`), new TabsView().getElement(), 
 renderElement(controlsElement, new FiltersView().getElement());
 
 const eventsElement = document.querySelector(`.trip-events`);
-renderElement(eventsElement, new SortingsView().getElement());
-
-renderElement(eventsElement, new EventsListView(eventsCount).getElement());
 if (eventsCount) {
-  const listElement = eventsElement.querySelector(`.trip-events__list`);
+  renderElement(eventsElement, new SortingsView().getElement());
+
+  const listElement = new EventsListView().getElement();
+  renderElement(eventsElement, listElement);
 
   events.forEach((eventData) => {
     const eventComponent = new EventView(eventData);
@@ -54,13 +55,30 @@ if (eventsCount) {
       listElement.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
     };
 
-    eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, switchToEdit);
-
-    eventEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === `Escape` || evt.key === `Esc`) {
+        evt.preventDefault();
+        switchToView();
+        document.removeEventListener(`keydown`, escKeyDownHandler);
+      }
+    };
+    const formCloseHandler = (evt) => {
       evt.preventDefault();
       switchToView();
+    };
+
+    eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+      switchToEdit();
+      document.addEventListener(`keydown`, escKeyDownHandler);
     });
+
+    const form = eventEditComponent.getElement().querySelector(`form`);
+    form.addEventListener(`submit`, formCloseHandler);
+    form.addEventListener(`reset`, formCloseHandler);
+    form.querySelector(`.event__rollup-btn`).addEventListener(`click`, formCloseHandler);
 
     renderElement(listElement, eventComponent.getElement());
   });
+} else {
+  renderElement(eventsElement, new NoEventsView().getElement());
 }
