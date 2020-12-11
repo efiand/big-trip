@@ -38,12 +38,29 @@ renderElement(eventsElement, new EventsListView(eventsCount).getElement());
 if (eventsCount) {
   const listElement = eventsElement.querySelector(`.trip-events__list`);
 
-  events.forEach((eventData, i) => {
-    renderElement(listElement, (i ? new EventView(eventData) : new EventEditView({
+  events.forEach((eventData) => {
+    const eventComponent = new EventView(eventData);
+    const eventEditComponent = new EventEditView({
       eventData,
       eventTypes,
       destinations,
       cities: CITY_NAMES
-    })).getElement());
+    });
+
+    const switchToEdit = () => {
+      listElement.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
+    };
+    const switchToView = () => {
+      listElement.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+    };
+
+    eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, switchToEdit);
+
+    eventEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      switchToView();
+    });
+
+    renderElement(listElement, eventComponent.getElement());
   });
 }
