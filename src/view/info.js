@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {createElement} from '../utils/render';
+import AbstractView from '../view/abstract';
 
 const createInfoTemplate = (events) => {
   const cities = Array.from(new Set(events.map((eventData) => {
@@ -23,24 +23,14 @@ const createInfoTemplate = (events) => {
   `;
 };
 
-export default class InfoView {
+export default class InfoView extends AbstractView {
   constructor(events) {
+    super();
+
     this._events = events;
   }
 
   getTemplate() {
     return createInfoTemplate(this._events);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

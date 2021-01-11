@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {capitalize} from '../utils/common';
-import {createElement} from '../utils/render';
+import AbstractView from '../view/abstract';
 
 const currentTime = dayjs().toISOString();
 
@@ -180,24 +180,14 @@ const createEventEditTemplate = ({eventData = null, eventTypes, destinations, ci
   `;
 };
 
-export default class EventEditView {
+export default class EventEditView extends AbstractView {
   constructor(payload) {
+    super();
+
     this._payload = payload;
   }
 
   getTemplate() {
     return createEventEditTemplate(this._payload);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

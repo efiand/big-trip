@@ -1,5 +1,5 @@
 import {capitalize} from '../utils/common';
-import {createElement} from '../utils/render';
+import AbstractView from '../view/abstract';
 
 const TABS = [`table`, `stats`];
 const defaultTab = TABS[0];
@@ -23,24 +23,14 @@ const createTabsTemplate = (activeTab) => {
   `;
 };
 
-export default class TabsView {
+export default class TabsView extends AbstractView {
   constructor(activeTab = defaultTab) {
+    super();
+
     this._activeTab = activeTab;
   }
 
   getTemplate() {
     return createTabsTemplate(this._activeTab);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

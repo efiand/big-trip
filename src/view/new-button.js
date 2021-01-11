@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render';
+import AbstractView from '../view/abstract';
 
 export const createNewButtonTemplate = () => {
   return `
@@ -8,20 +8,8 @@ export const createNewButtonTemplate = () => {
   `;
 };
 
-export default class NewButtonView {
+export default class NewButtonView extends AbstractView {
   getTemplate() {
     return createNewButtonTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

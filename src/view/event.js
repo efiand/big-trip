@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {capitalize, formatWithLead0} from '../utils/common';
-import {createElement} from '../utils/render';
+import AbstractView from '../view/abstract';
 
 const formatDuration = (startInstance, finishInstance) => {
   const minutes = finishInstance.diff(startInstance, `minute`);
@@ -101,24 +101,14 @@ export const createEventTemplate = ({
   `;
 };
 
-export default class EventView {
+export default class EventView extends AbstractView {
   constructor(eventData) {
+    super();
+
     this._event = eventData;
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
