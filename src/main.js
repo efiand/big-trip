@@ -15,7 +15,8 @@ import {destinations} from './mock/destinations';
 import {CITY_NAMES} from './mock/const';
 
 import {RenderPosition} from './const';
-import {getRandomInt, renderElement} from './utils';
+import {getRandomInt} from './utils/random';
+import {renderElement} from './utils/render';
 
 const EVENTS_RANGE = [15, 20];
 const eventsCount = getRandomInt(...EVENTS_RANGE);

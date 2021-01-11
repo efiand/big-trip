@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomItems} from '../utils';
+import {getRandomInt, getRandomItems} from '../utils/random';
 import {EVENT_TYPES, PRICE_RANGE} from './const';
 
 const OFFER_NAMES = [

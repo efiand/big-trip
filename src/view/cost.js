@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import {createElement} from '../utils/render';
 
 const createCostTemplate = (events) => {
   const cost = events.reduce((total, {price, type: {offers}}) => {

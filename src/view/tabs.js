@@ -1,4 +1,5 @@
-import {createElement, capitalize} from '../utils';
+import {capitalize} from '../utils/common';
+import {createElement} from '../utils/render';
 
 const TABS = [`table`, `stats`];
 const defaultTab = TABS[0];

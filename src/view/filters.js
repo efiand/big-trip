@@ -1,4 +1,5 @@
-import {createElement, capitalize} from '../utils';
+import {capitalize} from '../utils/common';
+import {createElement} from '../utils/render';
 import {FILTERS} from '../const';
 
 const defaultFilter = FILTERS[0];

@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomItem} from '../utils';
+import {getRandomInt, getRandomItem} from '../utils/random';
 import {CITY_NAMES} from './const';
 
 const PHRASES_RANGE = [1, 5];

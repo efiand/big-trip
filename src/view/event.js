@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import {capitalize, formatWithLead0, createElement} from '../utils';
+import {capitalize, formatWithLead0} from '../utils/common';
+import {createElement} from '../utils/render';
 
 const formatDuration = (startInstance, finishInstance) => {
   const minutes = finishInstance.diff(startInstance, `minute`);

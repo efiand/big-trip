@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import {capitalize, createElement} from '../utils';
+import {capitalize} from '../utils/common';
+import {createElement} from '../utils/render';
 
 const currentTime = dayjs().toISOString();
 
