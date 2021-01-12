@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render';
+import {Render} from '../utils';
 
 export default class AbstractView {
   constructor() {
@@ -16,7 +16,7 @@ export default class AbstractView {
 
   getElement() {
     if (!this._element) {
-      this._element = createElement(this.getTemplate());
+      this._element = Render.createElement(this.getTemplate());
     }
 
     return this._element;

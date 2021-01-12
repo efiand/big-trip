@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomItem} from '../utils/random';
+import {Random} from '../utils';
 import {CITY_NAMES} from './const';
 
 const PHRASES_RANGE = [1, 5];
@@ -19,10 +19,10 @@ const DESCRIPTION_PHRASES = [
 
 export const destinations = CITY_NAMES.map((city) => ({
   city,
-  description: new Array(getRandomInt(...PHRASES_RANGE)).fill().map(() => {
-    return getRandomItem(DESCRIPTION_PHRASES);
+  description: new Array(Random.getInt(...PHRASES_RANGE)).fill().map(() => {
+    return Random.getItem(DESCRIPTION_PHRASES);
   }).join(` `),
-  photos: new Array(getRandomInt(...PHOTOS_RANGE)).fill().map(() => {
-    return `http://picsum.photos/248/152?r=${getRandomInt(...PHOTONUMBERS_RANGE)}`;
+  photos: new Array(Random.getInt(...PHOTOS_RANGE)).fill().map(() => {
+    return `http://picsum.photos/248/152?r=${Random.getInt(...PHOTONUMBERS_RANGE)}`;
   })
 }));

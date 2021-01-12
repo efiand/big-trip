@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {capitalize} from '../utils/common';
+import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 
 const currentTime = dayjs().toISOString();
@@ -27,7 +27,7 @@ const createEventTypes = (eventTypes, typeName, id) => eventTypes.reduce((templa
         ${checkedAttr}
       />
       <label class="event__type-label event__type-label--${name}" for="event-type-${name}-${id}">
-        ${capitalize(name)}
+        ${Utils.capitalize(name)}
       </label>
     </div>
   `;
@@ -104,7 +104,7 @@ const createEventEditTemplate = ({eventData = null, eventTypes, destinations, ci
 
           <div class="event__field-group event__field-group--destination">
             <label class="event__label event__type-output" for="event-destination-${id}">
-              ${capitalize(typeName)}
+              ${Utils.capitalize(typeName)}
             </label>
             <input
               class="event__input event__input--destination"

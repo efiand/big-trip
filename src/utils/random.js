@@ -1,18 +1,20 @@
-import {shuffle} from './common';
+import {Utils} from '.';
 
-export const getRandomInt = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
+export default class Random {
+  static getInt(a = 0, b = 1) {
+    const lower = Math.ceil(Math.min(a, b));
+    const upper = Math.floor(Math.max(a, b));
 
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
+    return Math.floor(lower + Math.random() * (upper - lower + 1));
+  }
 
-export const getRandomItem = (list) => {
-  const randomIndex = getRandomInt(0, list.length - 1);
+  static getItem(list) {
+    const randomIndex = this.getInt(0, list.length - 1);
 
-  return list[randomIndex];
-};
+    return list[randomIndex];
+  }
 
-export const getRandomItems = (list, length = 0) => {
-  return shuffle(Array.from(list)).slice(0, length);
-};
+  static getItems(list, length = 0) {
+    return Utils.shuffle(Array.from(list)).slice(0, length);
+  }
+}

@@ -1,4 +1,4 @@
-import {capitalize} from '../utils/common';
+import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 
 const TABS = [`table`, `stats`];
@@ -11,7 +11,7 @@ const createTabsTemplate = (activeTab) => {
     return `
       ${markup}
       <a class="trip-tabs__btn ${activeClass}" href="#">
-        ${capitalize(tab)}
+        ${Utils.capitalize(tab)}
       </a>
     `;
   }, ``);

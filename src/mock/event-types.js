@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomItems} from '../utils/random';
+import {Random} from '../utils';
 import {EVENT_TYPES, PRICE_RANGE} from './const';
 
 const OFFER_NAMES = [
@@ -14,14 +14,14 @@ const OFFER_NAMES = [
 const OFFERS_COUNT_RANGE = [0, 5];
 
 export const eventTypes = EVENT_TYPES.map((typeName) => {
-  const offerNames = getRandomItems(OFFER_NAMES, getRandomInt(...OFFERS_COUNT_RANGE));
+  const offerNames = Random.getItems(OFFER_NAMES, Random.getInt(...OFFERS_COUNT_RANGE));
 
   return {
     name: typeName,
     offers: offerNames.map((name) => ({
       name,
       alias: name.slice(name.lastIndexOf(` `)).toLowerCase(),
-      price: getRandomInt(...PRICE_RANGE),
+      price: Random.getInt(...PRICE_RANGE),
       isChecked: false
     }))
   };

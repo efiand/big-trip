@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
-import {capitalize, formatWithLead0} from '../utils/common';
+import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 
 const formatDuration = (startInstance, finishInstance) => {
   const minutes = finishInstance.diff(startInstance, `minute`);
-  const minuteStr = `${formatWithLead0(minutes % 60)}M`;
+  const minuteStr = `${Utils.formatWithLead0(minutes % 60)}M`;
 
   if (minutes < 60) {
     return minuteStr;
@@ -70,7 +70,7 @@ export const createEventTemplate = ({
             alt="Event type icon"
           />
         </div>
-        <h3 class="event__title">${capitalize(type.name)} ${destination.city}</h3>
+        <h3 class="event__title">${Utils.capitalize(type.name)} ${destination.city}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${startDate.format()}">

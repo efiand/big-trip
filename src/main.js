@@ -15,29 +15,28 @@ import {destinations} from './mock/destinations';
 import {CITY_NAMES} from './mock/const';
 
 import {RenderPosition} from './const';
-import {getRandomInt} from './utils/random';
-import {render, replace} from './utils/render';
+import {Random, Render} from './utils';
 
 const EVENTS_RANGE = [15, 20];
-const eventsCount = getRandomInt(...EVENTS_RANGE);
+const eventsCount = Random.getInt(...EVENTS_RANGE);
 const events = new Array(eventsCount).fill().map(generateEvent);
 
 const headerMainElement = document.querySelector(`.trip-main`);
 const infoComponent = new InfoView(events);
-render(infoComponent, new CostView(events));
-render(headerMainElement, new NewButtonView());
-render(headerMainElement, infoComponent, RenderPosition.AFTERBEGIN);
+Render.render(infoComponent, new CostView(events));
+Render.render(headerMainElement, new NewButtonView());
+Render.render(headerMainElement, infoComponent, RenderPosition.AFTERBEGIN);
 
 const controlsElement = headerMainElement.querySelector(`.trip-controls`);
-render(controlsElement.querySelector(`h2`), new TabsView(), RenderPosition.AFTEREND);
-render(controlsElement, new FiltersView());
+Render.render(controlsElement.querySelector(`h2`), new TabsView(), RenderPosition.AFTEREND);
+Render.render(controlsElement, new FiltersView());
 
 const eventsElement = document.querySelector(`.trip-events`);
 if (eventsCount) {
-  render(eventsElement, new SortingsView());
+  Render.render(eventsElement, new SortingsView());
 
   const ListCompoment = new EventsListView();
-  render(eventsElement, ListCompoment);
+  Render.render(eventsElement, ListCompoment);
 
   events.forEach((eventData) => {
     const eventComponent = new EventView(eventData);
@@ -49,11 +48,11 @@ if (eventsCount) {
     });
 
     const switchToEdit = () => {
-      replace(eventEditComponent, eventComponent);
+      Render.replace(eventEditComponent, eventComponent);
       document.addEventListener(`keydown`, escKeyDownHandler);
     };
     const switchToView = () => {
-      replace(eventComponent, eventEditComponent);
+      Render.replace(eventComponent, eventEditComponent);
       document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
@@ -74,8 +73,8 @@ if (eventsCount) {
     });
     eventEditComponent.setCloseHandler(switchToView);
 
-    render(ListCompoment, eventComponent);
+    Render.render(ListCompoment, eventComponent);
   });
 } else {
-  render(eventsElement, new NoEventsView());
+  Render.render(eventsElement, new NoEventsView());
 }

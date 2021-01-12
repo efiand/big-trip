@@ -1,11 +1,11 @@
-import {capitalize} from '../utils/common';
+import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 import {FILTERS} from '../const';
 
 const defaultFilter = FILTERS[0];
 
 const createListMarkup = (activeFilter) => FILTERS.reduce((markup, filter) => {
-  const title = capitalize(filter);
+  const title = Utils.capitalize(filter);
   const isActive = filter === activeFilter;
 
   return `
