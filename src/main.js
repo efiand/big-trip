@@ -16,7 +16,7 @@ import {CITY_NAMES} from './mock/const';
 
 import {RenderPosition} from './const';
 import {getRandomInt} from './utils/random';
-import {renderElement} from './utils/render';
+import {render, replace} from './utils/render';
 
 const EVENTS_RANGE = [15, 20];
 const eventsCount = getRandomInt(...EVENTS_RANGE);
@@ -24,21 +24,20 @@ const events = new Array(eventsCount).fill().map(generateEvent);
 
 const headerMainElement = document.querySelector(`.trip-main`);
 const infoComponent = new InfoView(events);
-const infoElement = infoComponent.getElement();
-renderElement(infoElement, new CostView(events).getElement());
-renderElement(headerMainElement, new NewButtonView().getElement());
-renderElement(headerMainElement, infoElement, RenderPosition.AFTERBEGIN);
+render(infoComponent, new CostView(events));
+render(headerMainElement, new NewButtonView());
+render(headerMainElement, infoComponent, RenderPosition.AFTERBEGIN);
 
 const controlsElement = headerMainElement.querySelector(`.trip-controls`);
-renderElement(controlsElement.querySelector(`h2`), new TabsView().getElement(), RenderPosition.AFTEREND);
-renderElement(controlsElement, new FiltersView().getElement());
+render(controlsElement.querySelector(`h2`), new TabsView(), RenderPosition.AFTEREND);
+render(controlsElement, new FiltersView());
 
 const eventsElement = document.querySelector(`.trip-events`);
 if (eventsCount) {
-  renderElement(eventsElement, new SortingsView().getElement());
+  render(eventsElement, new SortingsView());
 
-  const listElement = new EventsListView().getElement();
-  renderElement(eventsElement, listElement);
+  const ListCompoment = new EventsListView();
+  render(eventsElement, ListCompoment);
 
   events.forEach((eventData) => {
     const eventComponent = new EventView(eventData);
@@ -50,11 +49,11 @@ if (eventsCount) {
     });
 
     const switchToEdit = () => {
-      listElement.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
+      replace(eventEditComponent, eventComponent);
       document.addEventListener(`keydown`, escKeyDownHandler);
     };
     const switchToView = () => {
-      listElement.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+      replace(eventComponent, eventEditComponent);
       document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
@@ -75,8 +74,8 @@ if (eventsCount) {
     });
     eventEditComponent.setCloseHandler(switchToView);
 
-    renderElement(listElement, eventComponent.getElement());
+    render(ListCompoment, eventComponent);
   });
 } else {
-  renderElement(eventsElement, new NoEventsView().getElement());
+  render(eventsElement, new NoEventsView());
 }
