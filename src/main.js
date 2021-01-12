@@ -51,32 +51,29 @@ if (eventsCount) {
 
     const switchToEdit = () => {
       listElement.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
+      document.addEventListener(`keydown`, escKeyDownHandler);
     };
     const switchToView = () => {
       listElement.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+      document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
         evt.preventDefault();
         switchToView();
-        document.removeEventListener(`keydown`, escKeyDownHandler);
       }
     };
-    const formCloseHandler = (evt) => {
-      evt.preventDefault();
+
+    eventComponent.setClickHandler(switchToEdit);
+
+    eventEditComponent.setSubmitHandler(() => {
       switchToView();
-    };
-
-    eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-      switchToEdit();
-      document.addEventListener(`keydown`, escKeyDownHandler);
     });
-
-    const form = eventEditComponent.getElement().querySelector(`form`);
-    form.addEventListener(`submit`, formCloseHandler);
-    form.addEventListener(`reset`, formCloseHandler);
-    form.querySelector(`.event__rollup-btn`).addEventListener(`click`, formCloseHandler);
+    eventEditComponent.setResetHandler(() => {
+      switchToView();
+    });
+    eventEditComponent.setCloseHandler(switchToView);
 
     renderElement(listElement, eventComponent.getElement());
   });

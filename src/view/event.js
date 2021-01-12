@@ -106,9 +106,24 @@ export default class EventView extends AbstractView {
     super();
 
     this._event = eventData;
+    this._clickHandler = this._clickHandler.bind(this);
+  }
+
+  get _switchControl() {
+    return this.getElement().querySelector(`.event__rollup-btn`);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this._switchControl.addEventListener(`click`, this._clickHandler);
   }
 }
