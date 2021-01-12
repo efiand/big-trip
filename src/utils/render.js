@@ -3,7 +3,7 @@ import {RenderPosition} from '../const';
 
 export default class Render {
   // Создаёт DOM-элемент из шаблона
-  static createElement (template) {
+  static createElement(template) {
     const newElement = document.createElement(`div`);
     newElement.innerHTML = template.trim();
 
@@ -12,7 +12,7 @@ export default class Render {
 
   // Добавляет в DOM-элемент потомка
   // Родитель и потомок могут быть переданы в виде компонента, DOM-элемента или строкового шаблона
-  static render (container, child, place = RenderPosition.BEFOREEND) {
+  static render(container, child, place = RenderPosition.BEFOREEND) {
     if (container instanceof AbstractView) {
       container = container.getElement();
     }
@@ -24,7 +24,7 @@ export default class Render {
     container.insertAdjacentElement(place, child);
   }
 
-  static renderTemplate (container, template, place = RenderPosition.BEFOREEND) {
+  static renderTemplate(container, template, place = RenderPosition.BEFOREEND) {
     if (typeof container === `string`) {
       container = this.createElement(container);
     }
@@ -32,7 +32,7 @@ export default class Render {
     container.insertAdjacentHTML(place, template);
   }
 
-  static replace (newChild, oldChild) {
+  static replace(newChild, oldChild) {
     if (oldChild instanceof AbstractView) {
       oldChild = oldChild.getElement();
     }
@@ -50,7 +50,7 @@ export default class Render {
     parent.replaceChild(newChild, oldChild);
   }
 
-  static remove (component) {
+  static remove(component) {
     if (!(component instanceof AbstractView)) {
       throw new Error(`Can remove only components`);
     }
