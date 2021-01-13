@@ -58,7 +58,7 @@ if (pointsCount) {
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.prpointDefault();
+        evt.preventDefault();
         switchToView();
       }
     };
