@@ -1,12 +1,12 @@
 import dayjs from 'dayjs';
 import AbstractView from '../view/abstract';
 
-const createInfoTemplate = (events) => {
-  const cities = Array.from(new Set(events.map((eventData) => {
-    return eventData.destination.city;
+const createInfoTemplate = (points) => {
+  const cities = Array.from(new Set(points.map((pointData) => {
+    return pointData.destination.city;
   })));
-  const startDate = dayjs(events[0].startTime);
-  const finishDate = dayjs(events[events.length - 1].finishTime);
+  const startDate = dayjs(points[0].startTime);
+  const finishDate = dayjs(points[points.length - 1].finishTime);
   const isEqualMonths = startDate.month() === finishDate.month();
   const startDateStr = startDate.format(`MMM DD`);
   const finishDateStr = finishDate.format(isEqualMonths ? `DD` : `MMM DD`);
@@ -24,13 +24,13 @@ const createInfoTemplate = (events) => {
 };
 
 export default class InfoView extends AbstractView {
-  constructor(events) {
+  constructor(points) {
     super();
 
-    this._events = events;
+    this._points = points;
   }
 
   getTemplate() {
-    return createInfoTemplate(this._events);
+    return createInfoTemplate(this._points);
   }
 }

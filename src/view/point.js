@@ -43,7 +43,7 @@ const createOffersList = (offers) => {
   `;
 };
 
-export const createEventTemplate = ({
+export const createPointTemplate = ({
   type,
   destination,
   startTime,
@@ -101,11 +101,11 @@ export const createEventTemplate = ({
   `;
 };
 
-export default class EventView extends AbstractView {
-  constructor(eventData) {
+export default class PointView extends AbstractView {
+  constructor(pointData) {
     super();
 
-    this._event = eventData;
+    this._point = pointData;
     this._clickHandler = this._clickHandler.bind(this);
   }
 
@@ -119,7 +119,7 @@ export default class EventView extends AbstractView {
   }
 
   getTemplate() {
-    return createEventTemplate(this._event);
+    return createPointTemplate(this._point);
   }
 
   setClickHandler(callback) {

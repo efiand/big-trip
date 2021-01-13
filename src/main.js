@@ -4,26 +4,26 @@ import TabsView from './view/tabs';
 import FiltersView from './view/filters';
 import NewButtonView from './view/new-button';
 import SortingsView from './view/sort';
-import EventsListView from './view/events-list';
-import NoEventsView from './view/no-events';
-import EventView from './view/event';
-import EventEditView from './view/event-edit';
+import PointsListView from './view/points-list';
+import NoPointsView from './view/no-points';
+import PointView from './view/point';
+import PointEditView from './view/point-edit';
 
-import {generateEvent} from './mock/event';
-import {eventTypes} from './mock/event-types';
+import {generatePoint} from './mock/point';
+import {pointTypes} from './mock/point-types';
 import {destinations} from './mock/destinations';
 import {CITY_NAMES} from './mock/const';
 
 import {RenderPosition} from './const';
 import {Random, Render} from './utils';
 
-const EVENTS_RANGE = [15, 20];
-const eventsCount = Random.getInt(...EVENTS_RANGE);
-const events = new Array(eventsCount).fill().map(generateEvent);
+const POINTS_RANGE = [15, 20];
+const pointsCount = Random.getInt(...POINTS_RANGE);
+const points = new Array(pointsCount).fill().map(generatePoint);
 
 const headerMainElement = document.querySelector(`.trip-main`);
-const infoComponent = new InfoView(events);
-Render.render(infoComponent, new CostView(events));
+const infoComponent = new InfoView(points);
+Render.render(infoComponent, new CostView(points));
 Render.render(headerMainElement, new NewButtonView());
 Render.render(headerMainElement, infoComponent, RenderPosition.AFTERBEGIN);
 
@@ -31,50 +31,50 @@ const controlsElement = headerMainElement.querySelector(`.trip-controls`);
 Render.render(controlsElement.querySelector(`h2`), new TabsView(), RenderPosition.AFTEREND);
 Render.render(controlsElement, new FiltersView());
 
-const eventsElement = document.querySelector(`.trip-events`);
-if (eventsCount) {
-  Render.render(eventsElement, new SortingsView());
+const pointsElement = document.querySelector(`.trip-events`);
+if (pointsCount) {
+  Render.render(pointsElement, new SortingsView());
 
-  const ListCompoment = new EventsListView();
-  Render.render(eventsElement, ListCompoment);
+  const ListCompoment = new PointsListView();
+  Render.render(pointsElement, ListCompoment);
 
-  events.forEach((eventData) => {
-    const eventComponent = new EventView(eventData);
-    const eventEditComponent = new EventEditView({
-      eventData,
-      eventTypes,
+  points.forEach((pointData) => {
+    const pointComponent = new PointView(pointData);
+    const pointEditComponent = new PointEditView({
+      pointData,
+      pointTypes,
       destinations,
       cities: CITY_NAMES
     });
 
     const switchToEdit = () => {
-      Render.replace(eventEditComponent, eventComponent);
+      Render.replace(pointEditComponent, pointComponent);
       document.addEventListener(`keydown`, escKeyDownHandler);
     };
     const switchToView = () => {
-      Render.replace(eventComponent, eventEditComponent);
+      Render.replace(pointComponent, pointEditComponent);
       document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
+        evt.prpointDefault();
         switchToView();
       }
     };
 
-    eventComponent.setClickHandler(switchToEdit);
+    pointComponent.setClickHandler(switchToEdit);
 
-    eventEditComponent.setSubmitHandler(() => {
+    pointEditComponent.setSubmitHandler(() => {
       switchToView();
     });
-    eventEditComponent.setResetHandler(() => {
+    pointEditComponent.setResetHandler(() => {
       switchToView();
     });
-    eventEditComponent.setCloseHandler(switchToView);
+    pointEditComponent.setCloseHandler(switchToView);
 
-    Render.render(ListCompoment, eventComponent);
+    Render.render(ListCompoment, pointComponent);
   });
 } else {
-  Render.render(eventsElement, new NoEventsView());
+  Render.render(pointsElement, new NoPointsView());
 }

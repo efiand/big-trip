@@ -13,7 +13,7 @@ const getDefaultData = (type, destination) => ({
   price: ``
 });
 
-const createEventTypes = (eventTypes, typeName, id) => eventTypes.reduce((template, {name}) => {
+const createPointTypes = (pointTypes, typeName, id) => pointTypes.reduce((template, {name}) => {
   const checkedAttr = name === typeName ? `checked` : ``;
   return `
     ${template}
@@ -64,12 +64,12 @@ const createPhotosList = (photos) => photos.reduce((template, photo) => {
   return `${template}<img class="event__photo" src="${photo}" alt="Event photo">`;
 }, ``);
 
-const createEventEditTemplate = ({eventData = null, eventTypes, destinations, cities}) => {
-  const addMode = !eventData;
+const createPointEditTemplate = ({pointData = null, pointTypes, destinations, cities}) => {
+  const addMode = !pointData;
   if (addMode) {
-    eventData = getDefaultData(eventTypes[0], destinations[0]);
+    pointData = getDefaultData(pointTypes[0], destinations[0]);
   }
-  const {id, type, destination, startTime, finishTime, price} = eventData;
+  const {id, type, destination, startTime, finishTime, price} = pointData;
   const {offers, name: typeName} = type;
   const {city, description, photos} = destination;
 
@@ -97,7 +97,7 @@ const createEventEditTemplate = ({eventData = null, eventTypes, destinations, ci
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createEventTypes(eventTypes, type, id)}
+                ${createPointTypes(pointTypes, type, id)}
               </fieldset>
             </div>
           </div>
@@ -214,7 +214,7 @@ export default class EventEditView extends AbstractView {
   }
 
   getTemplate() {
-    return createEventEditTemplate(this._payload);
+    return createPointEditTemplate(this._payload);
   }
 
   setCloseHandler(callback) {

@@ -1,7 +1,7 @@
 import AbstractView from '../view/abstract';
 
-const createCostTemplate = (events) => {
-  const cost = events.reduce((total, {price, type: {offers}}) => {
+const createCostTemplate = (points) => {
+  const cost = points.reduce((total, {price, type: {offers}}) => {
     return total + price + offers.reduce((offersTotal, offer) => {
       return offersTotal + (offer.isChecked ? offer.price : 0);
     }, 0);
@@ -15,13 +15,13 @@ const createCostTemplate = (events) => {
 };
 
 export default class CostView extends AbstractView {
-  constructor(events) {
+  constructor(points) {
     super();
 
-    this._events = events;
+    this._points = points;
   }
 
   getTemplate() {
-    return createCostTemplate(this._events);
+    return createCostTemplate(this._points);
   }
 }

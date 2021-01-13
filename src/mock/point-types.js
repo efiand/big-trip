@@ -1,5 +1,5 @@
 import {Random} from '../utils';
-import {EVENT_TYPES, PRICE_RANGE} from './const';
+import {POINT_TYPES, PRICE_RANGE} from './const';
 
 const OFFER_NAMES = [
   `Order Uber`,
@@ -13,7 +13,7 @@ const OFFER_NAMES = [
 ];
 const OFFERS_COUNT_RANGE = [0, 5];
 
-export const eventTypes = EVENT_TYPES.map((typeName) => {
+export const pointTypes = POINT_TYPES.map((typeName) => {
   const offerNames = Random.getItems(OFFER_NAMES, Random.getInt(...OFFERS_COUNT_RANGE));
 
   return {

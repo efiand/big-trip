@@ -8,7 +8,7 @@ export const CITY_NAMES = [
   `Lisbon`
 ];
 
-export const EVENT_TYPES = [
+export const POINT_TYPES = [
   `taxi`,
   `bus`,
   `train`,
