@@ -1,11 +1,7 @@
 import SortingsView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
-import PointView from '../view/point';
-import PointEditView from '../view/point-edit';
-import {pointTypes} from '../mock/point-types';
-import {destinations} from '../mock/destinations';
-import {CITY_NAMES} from '../mock/const';
+import PointPresenter from '../presenter/point';
 import {Render} from '../utils';
 
 export default class TripPresenter {
@@ -30,41 +26,8 @@ export default class TripPresenter {
   }
 
   _renderPoint(pointData) {
-    const pointComponent = new PointView(pointData);
-    const pointEditComponent = new PointEditView({
-      pointData,
-      pointTypes,
-      destinations,
-      cities: CITY_NAMES
-    });
-
-    const switchToEdit = () => {
-      Render.replace(pointEditComponent, pointComponent);
-      document.addEventListener(`keydown`, escKeyDownHandler);
-    };
-    const switchToView = () => {
-      Render.replace(pointComponent, pointEditComponent);
-      document.removeEventListener(`keydown`, escKeyDownHandler);
-    };
-
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        switchToView();
-      }
-    };
-
-    pointComponent.setClickHandler(switchToEdit);
-
-    pointEditComponent.setSubmitHandler(() => {
-      switchToView();
-    });
-    pointEditComponent.setResetHandler(() => {
-      switchToView();
-    });
-    pointEditComponent.setCloseHandler(switchToView);
-
-    Render.render(this._pointsListComponent, pointComponent);
+    const pointPresenter = new PointPresenter(this._pointsListComponent);
+    pointPresenter.init(pointData);
   }
 
   _renderPoints() {
