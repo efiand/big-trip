@@ -26,7 +26,7 @@ export default class TripPresenter {
   }
 
   _renderPoint(pointData) {
-    const pointPresenter = new PointPresenter(this._pointsListComponent);
+    const pointPresenter = new PointPresenter(this._pointsListComponent.getElement());
     pointPresenter.init(pointData);
   }
 

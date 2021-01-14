@@ -6,8 +6,8 @@ import {destinations} from '../mock/destinations';
 import {CITY_NAMES} from '../mock/const';
 
 export default class PointPresenter {
-  constructor(pointsListComponent) {
-    this._pointsListComponent = pointsListComponent;
+  constructor(pointsListContainer) {
+    this._pointsListContainer = pointsListContainer;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -20,6 +20,9 @@ export default class PointPresenter {
 
   init(pointData) {
     this._pointData = pointData;
+
+    const prevPointComponent = this._pointComponent;
+    const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(pointData);
     this._pointEditComponent = new PointEditView({
@@ -38,7 +41,26 @@ export default class PointPresenter {
     });
     this._pointEditComponent.setCloseHandler(this._switchToView);
 
-    Render.render(this._pointsListComponent, this._pointComponent);
+    if (prevPointComponent === null || prevPointEditComponent) {
+      Render.render(this._pointsListContainer, this._pointComponent);
+      return;
+    }
+
+    // Проверка на наличие в DOM - чтобы не заменять то, что не было отрисовано
+    if (this._pointsListContainer.getElement().contains(prevPointComponent.getElement())) {
+      Render.replace(this._pointsListContainer, prevPointComponent);
+    }
+    if (this._pointsListContainer.getElement().contains(prevPointEditComponent.getElement())) {
+      Render.replace(this._pointsListContainer, prevPointEditComponent);
+    }
+
+    Render.remove(prevPointComponent);
+    Render.remove(prevPointEditComponent);
+  }
+
+  _destroy() {
+    Render.remove(this._pointComponent);
+    Render.remove(this._pointEditComponent);
   }
 
   _escKeyDownHandler(evt) {
