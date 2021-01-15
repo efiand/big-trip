@@ -7,7 +7,6 @@ import {destinations} from './destinations';
 const DURATION_RANGE = [10, 60 * 24 * 3]; // для выбора случайной длительности от 10 мин. до 3 сут.
 const MINUTE_NAME = `minute`;
 let tempTime = dayjs().add(Random.getInt(...DURATION_RANGE), MINUTE_NAME);
-let counter = 0;
 
 export const generatePoint = () => {
   // Начало следующего мероприятия совпадает с окончанием ранее сгенерированного
@@ -25,7 +24,7 @@ export const generatePoint = () => {
   });
 
   return {
-    id: ++counter,
+    id: Random.generateId(),
     type,
     destination: destinations.find(({city}) => city === cityName),
     startTime,

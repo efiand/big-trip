@@ -13,6 +13,7 @@ export default class TripPresenter {
     this._noPointsComponent = new NoPointsView();
 
     this._points = [];
+    this._pointPresenters = {};
   }
 
   init(points) {
@@ -28,14 +29,20 @@ export default class TripPresenter {
   _renderPoint(pointData) {
     const pointPresenter = new PointPresenter(this._pointsListComponent.getElement());
     pointPresenter.init(pointData);
+    this._pointPresenters[pointData.id] = pointPresenter;
   }
 
-  _renderPoints() {
+  _renderPointsList() {
     Render.render(this._tripContainer, this._pointsListComponent);
 
     this._points.forEach((pointData) => {
       this._renderPoint(pointData);
     });
+  }
+
+  _clearPointsList() {
+    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
+    this._pointPresenters = {};
   }
 
   _renderNoPoints() {
@@ -45,7 +52,7 @@ export default class TripPresenter {
   _renderTrip() {
     if (this._points.length) {
       this._renderSortings();
-      this._renderPoints();
+      this._renderPointsList();
     } else {
       this._renderNoPoints();
     }

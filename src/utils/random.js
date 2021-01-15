@@ -17,4 +17,8 @@ export default class Random {
   static getItems(list, length = 0) {
     return Utils.shuffle(Array.from(list)).slice(0, length);
   }
+
+  static generateId() {
+    return Date.now() + parseInt(Math.random() * 10000, 10);
+  }
 }
