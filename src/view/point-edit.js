@@ -210,7 +210,7 @@ export default class EventEditView extends AbstractView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._payload.pointData);
   }
 
   getTemplate() {

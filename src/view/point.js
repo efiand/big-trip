@@ -106,24 +106,40 @@ export default class PointView extends AbstractView {
     super();
 
     this._point = pointData;
-    this._clickHandler = this._clickHandler.bind(this);
+
+    this._editClickHandler = this._editClickHandler.bind(this);
+    this._favClickHandler = this._favClickHandler.bind(this);
   }
 
   get _switchControl() {
     return this.getElement().querySelector(`.event__rollup-btn`);
   }
 
-  _clickHandler(evt) {
+  get _favControl() {
+    return this.getElement().querySelector(`.event__favorite-btn`);
+  }
+
+  _editClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.editClick();
+  }
+
+  _favClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favClick();
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this._switchControl.addEventListener(`click`, this._clickHandler);
+  setEditClickHandler(editCallback) {
+    this._callback.editClick = editCallback;
+    this._switchControl.addEventListener(`click`, this._editClickHandler);
+  }
+
+  setFavClickHandler(favCallback) {
+    this._callback.favClick = favCallback;
+    this._favControl.addEventListener(`click`, this._favClickHandler);
   }
 }

@@ -5,17 +5,28 @@ import {pointTypes} from '../mock/point-types';
 import {destinations} from '../mock/destinations';
 import {CITY_NAMES} from '../mock/const';
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
 export default class PointPresenter {
-  constructor(pointsListContainer) {
+  constructor(pointsListContainer, changeData, changeMode) {
     this._pointsListContainer = pointsListContainer;
+    this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
-    this._pointData = {};
+    // this._pointData = {};
+    this._mode = Mode.DEFAULT;
 
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._switchToEdit = this._switchToEdit.bind(this);
-    this._switchToView = this._switchToView.bind(this);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleEditClick = this._handleEditClick.bind(this);
+    this._handleFavClick = this._handleFavClick.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleResetClick = this._handleResetClick.bind(this);
   }
 
   init(pointData) {
@@ -32,26 +43,22 @@ export default class PointPresenter {
       cities: CITY_NAMES
     });
 
-    this._pointComponent.setClickHandler(this._switchToEdit);
-    this._pointEditComponent.setSubmitHandler(() => {
-      this._switchToView();
-    });
-    this._pointEditComponent.setResetHandler(() => {
-      this._switchToView();
-    });
-    this._pointEditComponent.setCloseHandler(this._switchToView);
+    this._pointComponent.setEditClickHandler(this._handleEditClick);
+    this._pointComponent.setFavClickHandler(this._handleFavClick);
+    this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setResetHandler(this._handleResetClick);
+    this._pointEditComponent.setCloseHandler(this._handleCloseClick);
 
-    if (prevPointComponent === null || prevPointEditComponent) {
+    if (prevPointComponent === null || prevPointEditComponent === null) {
       Render.render(this._pointsListContainer, this._pointComponent);
       return;
     }
 
-    // Проверка на наличие в DOM - чтобы не заменять то, что не было отрисовано
-    if (this._pointsListContainer.getElement().contains(prevPointComponent.getElement())) {
-      Render.replace(this._pointsListContainer, prevPointComponent);
+    if (this._mode === Mode.DEFAULT) {
+      Render.replace(this._pointComponent, prevPointComponent);
     }
-    if (this._pointsListContainer.getElement().contains(prevPointEditComponent.getElement())) {
-      Render.replace(this._pointsListContainer, prevPointEditComponent);
+    if (this._mode === Mode.EDITING) {
+      Render.replace(this._pointEditComponent, prevPointEditComponent);
     }
 
     Render.remove(prevPointComponent);
@@ -70,21 +77,47 @@ export default class PointPresenter {
     }
   }
 
-  _handleEditClick() {
-    this._replaceCardToForm();
+  _handleCloseClick() {
+    this._switchToView();
   }
 
-  _handleFormSubmit() {
-    this._replaceFormToCard();
+  _handleDeleteClick() {
+    this._switchToView();
+  }
+
+  _handleEditClick() {
+    this._switchToEdit();
+  }
+
+  _handleFavClick() {
+    this._changeData(Object.assign({}, this._pointData, {isFavorite: !this._pointData.isFavorite}));
+  }
+
+  _handleFormSubmit(pointData) {
+    this._changeData(pointData);
+    this._switchToView();
+  }
+
+  _handleResetClick() {
+    this._switchToView();
   }
 
   _switchToEdit() {
     Render.replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   _switchToView() {
     Render.replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._switchToView();
+    }
   }
 }
