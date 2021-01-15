@@ -21,4 +21,15 @@ export default class Utils {
   static formatWithLead0(num) {
     return `${num < NUMERAL_SYSTEM_BASE ? 0 : ``}${num}`;
   }
+
+  // Обновляет элемент массива
+  static updateItem(list, update) {
+    const i = list.findIndex((item) => item.id === update.id);
+
+    if (i === -1) {
+      return list;
+    }
+
+    return [...list.slice(0, i), update, ...list.slice(i + 1)];
+  }
 }

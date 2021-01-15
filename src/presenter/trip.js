@@ -2,7 +2,7 @@ import SortingsView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
 import PointPresenter from '../presenter/point';
-import {Render} from '../utils';
+import {Render, Utils} from '../utils';
 
 export default class TripPresenter {
   constructor(tripContainer) {
@@ -20,6 +20,11 @@ export default class TripPresenter {
     this._points = points.slice();
 
     this._renderTrip();
+  }
+
+  _changePoint(updatedPoint) {
+    this._points = Utils.updateItem(this._points, updatedPoint);
+    this._pointPresenters[updatedPoint.id].init(updatedPoint);
   }
 
   _renderSortings() {
