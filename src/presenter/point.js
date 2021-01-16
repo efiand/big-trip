@@ -17,7 +17,7 @@ export default class PointPresenter {
 
     this._pointComponent = null;
     this._pointEditComponent = null;
-    // this._pointData = {};
+    this._pointData = {};
     this._mode = Mode.DEFAULT;
 
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
@@ -65,7 +65,7 @@ export default class PointPresenter {
     Render.remove(prevPointEditComponent);
   }
 
-  _destroy() {
+  destroy() {
     Render.remove(this._pointComponent);
     Render.remove(this._pointEditComponent);
   }
