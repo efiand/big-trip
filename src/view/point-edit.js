@@ -1,39 +1,43 @@
-import dayjs from 'dayjs';
-import {Utils} from '../utils';
-import AbstractView from '../view/abstract';
+import {Dates, Utils} from '../utils';
+import SmartView from '../view/smart';
+import {pointTypes} from '../mock/point-types';
+import {destinations} from '../mock/destinations';
+import {CITY_NAMES} from '../mock/const';
 
-const currentTime = dayjs().toISOString();
+const getDefaultData = (type, destination) => {
+  const startTime = Dates.getNowISO();
 
-const getDefaultData = (type, destination) => ({
-  id: 0,
-  type,
-  destination,
-  startTime: currentTime,
-  finishTime: currentTime,
-  price: ``
-});
+  return {
+    id: 0, // для постфикса связки лейбла и инпута
+    type,
+    destination,
+    startTime,
+    finishTime: startTime,
+    price: ``
+  };
+};
 
-const createPointTypes = (pointTypes, typeName, id) => pointTypes.reduce((template, {name}) => {
+const createPointTypes = (typeName) => pointTypes.reduce((template, {name}, i) => {
   const checkedAttr = name === typeName ? `checked` : ``;
   return `
     ${template}
     <div class="event__type-item">
       <input
-        id="event-type-${name}-${id}"
+        id="event-type-${name}-${i + 1}"
         class="event__type-input visually-hidden"
         type="radio"
         name="event-type"
         value="${name}"
         ${checkedAttr}
       />
-      <label class="event__type-label event__type-label--${name}" for="event-type-${name}-${id}">
+      <label class="event__type-label event__type-label--${name}" for="event-type-${name}-${i + 1}">
         ${Utils.capitalize(name)}
       </label>
     </div>
   `;
 }, ``);
 
-const createCitiesList = (cities) => cities.reduce((template, cityName) => {
+const createCitiesList = () => CITY_NAMES.reduce((template, cityName) => {
   return `${template}<option value="${cityName}"></option>`;
 }, ``);
 
@@ -64,7 +68,7 @@ const createPhotosList = (photos) => photos.reduce((template, photo) => {
   return `${template}<img class="event__photo" src="${photo}" alt="Event photo">`;
 }, ``);
 
-const createPointEditTemplate = ({pointData = null, pointTypes, destinations, cities}) => {
+const createPointEditTemplate = (pointData = null) => {
   const addMode = !pointData;
   if (addMode) {
     pointData = getDefaultData(pointTypes[0], destinations[0]);
@@ -72,6 +76,7 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
   const {id, type, destination, startTime, finishTime, price} = pointData;
   const {offers, name: typeName} = type;
   const {city, description, photos} = destination;
+  const isSubmitDisabled = !city;
 
   return `
     <li class="trip-events__item">
@@ -97,7 +102,7 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointTypes(pointTypes, type, id)}
+                ${createPointTypes(type)}
               </fieldset>
             </div>
           </div>
@@ -114,7 +119,7 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
               value="${city}"
               list="destination-list-${id}"
             />
-            <datalist id="destination-list-${id}">${createCitiesList(cities)}</datalist>
+            <datalist id="destination-list-${id}">${createCitiesList()}</datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
@@ -124,7 +129,7 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
               id="event-start-time-${id}"
               type="text"
               name="event-start-time"
-              value="${dayjs(startTime).format(`DD/MM/YY HH:mm`)}"
+              value="${startTime}"
             />
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
@@ -133,7 +138,7 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
               id="event-end-time-${id}"
               type="text"
               name="event-end-time"
-              value="${dayjs(finishTime).format(`DD/MM/YY HH:mm`)}"
+              value="${finishTime}"
             />
           </div>
 
@@ -150,7 +155,11 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
             />
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit">Save</button>
+          <button
+            class="event__save-btn btn btn--blue"
+            type="submit"
+            ${isSubmitDisabled ? `disabled` : ``}
+          >Save</button>
           <button class="event__reset-btn" type="reset">
             ${addMode ? `Cancel` : `Delete`}
           </button>
@@ -166,36 +175,100 @@ const createPointEditTemplate = ({pointData = null, pointTypes, destinations, ci
             <div class="event__available-offers">${createOffersList(offers)}</div>
           </section>` : ``}
 
-          <section class="event__section event__section--destination">
+          ${description && photos ? `<section class="event__section event__section--destination">
             <h3 class="event__section-title event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${description}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">${createPhotosList(photos)}</div>
             </div>
-          </section>
+          </section>` : ``}
         </section>
       </form>
     </li>
   `;
 };
 
-export default class EventEditView extends AbstractView {
-  constructor(payload) {
+export default class PointEditView extends SmartView {
+  constructor(point) {
     super();
 
-    this._payload = payload;
+    this._data = PointEditView.parsePointToData(point);
+
+    this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
+    this._changeOfferHandler = this._changeOfferHandler.bind(this);
+    this._changePriceHandler = this._changePriceHandler.bind(this);
+    this._changePointTypeHandler = this._changePointTypeHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
-    this._resetHandler = this._resetHandler.bind(this);
+    this._deleteHandler = this._deleteHandler.bind(this);
+    this._inputDestinationHandler = this._inputDestinationHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  get _closeControl() {
+    return this._form.querySelector(`.event__rollup-btn`);
+  }
+
+  get _destinationField() {
+    return this._form.querySelector(`[name="event-destination"]`);
   }
 
   get _form() {
     return this.getElement().querySelector(`form`);
   }
 
-  get _closeControl() {
-    return this._form.querySelector(`.event__rollup-btn`);
+  get _offerCheckboxes() {
+    return this._form.querySelectorAll(`.event__offer-checkbox`);
+  }
+
+  get _priceField() {
+    return this._form.querySelector(`[name="event-price"]`);
+  }
+
+  get _typeRadioBtns() {
+    return this._form.querySelectorAll(`[name="event-type"]`);
+  }
+
+  _changeDestinationHandler(evt) {
+    evt.preventDefault();
+
+    const destination = PointEditView.getDestination(evt.target.value);
+    this.updateData({
+      destination
+    });
+  }
+
+  _changeOfferHandler(evt) {
+    evt.preventDefault();
+    const alias = evt.target.name.replace(`event-offer-`, ``);
+    const {type} = this._data;
+    const offers = type.offers.slice();
+    const currentIndex = offers.findIndex((item) => item.alias === alias);
+    offers[currentIndex].isChecked = evt.target.checked;
+
+    this.updateData({
+      type: Object.assign({}, type, {
+        offers
+      })
+    }, null);
+  }
+
+  _changePointTypeHandler(evt) {
+    evt.preventDefault();
+
+    this.updateData({
+      type: pointTypes.find((type) => type.name === evt.target.value)
+    });
+  }
+
+  _changePriceHandler(evt) {
+    evt.preventDefault();
+
+    this.updateData({
+      price: evt.target.value
+    }, null);
   }
 
   _closeClickHandler(evt) {
@@ -203,18 +276,48 @@ export default class EventEditView extends AbstractView {
     this._callback.close();
   }
 
-  _resetHandler(evt) {
+  _deleteHandler(evt) {
     evt.preventDefault();
-    this._callback.formReset();
+    this._callback.delete();
+  }
+
+  _inputDestinationHandler(evt) {
+    evt.preventDefault();
+
+    const destination = PointEditView.getDestination(evt.target.value);
+    this.updateData({
+      destination
+    }, destination.description ? this.updateELement : null);
+  }
+
+  _setInnerHandlers() {
+    for (const radioBtn of this._typeRadioBtns) {
+      radioBtn.addEventListener(`change`, this._changePointTypeHandler);
+    }
+
+    for (const checkbox of this._offerCheckboxes) {
+      checkbox.addEventListener(`change`, this._changeOfferHandler);
+    }
+
+    this._destinationField.addEventListener(`input`, this._inputDestinationHandler);
+    this._destinationField.addEventListener(`change`, this._changeDestinationHandler);
+    this._priceField.addEventListener(`change`, this._changePriceHandler);
   }
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._payload.pointData);
+    this._callback.submit(PointEditView.parseDataToPoint(this._data));
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._payload);
+    return createPointEditTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseHandler(this._callback.close);
+    this.setDeleteHandler(this._callback.delete);
+    this.setSubmitHandler(this._callback.submit);
   }
 
   setCloseHandler(callback) {
@@ -222,13 +325,42 @@ export default class EventEditView extends AbstractView {
     this._closeControl.addEventListener(`click`, this._closeClickHandler);
   }
 
-  setResetHandler(callback) {
-    this._callback.formReset = callback;
-    this._form.addEventListener(`reset`, this._resetHandler);
+  setDeleteHandler(callback) {
+    this._callback.delete = callback;
+    this._form.addEventListener(`reset`, this._deleteHandler);
   }
 
   setSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
+    this._callback.submit = callback;
     this._form.addEventListener(`submit`, this._submitHandler);
+  }
+
+  static getDestination(city) {
+    city = city.trim();
+    const destination = destinations.find((item) => item.city === city) || {
+      city,
+      description: null,
+      photos: null
+    };
+
+    return destination;
+  }
+
+  static parsePointToData(point) {
+    return Object.assign({}, point, {
+      startTime: Dates.humanize(point.startTime),
+      finishTime: Dates.humanize(point.finishTime),
+      price: point.price.toString()
+    });
+  }
+
+  static parseDataToPoint(data) {
+    const price = parseInt(data.price.trim(), 10);
+
+    return Object.assign({}, data, {
+      startTime: Dates.unhumanize(data.startTime),
+      finishTime: Dates.unhumanize(data.finishTime),
+      price: isNaN(price) ? 0 : price
+    });
   }
 }

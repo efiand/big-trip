@@ -1,14 +1,12 @@
 import PointView from '../view/point';
 import PointEditView from '../view/point-edit';
 import {Render} from '../utils';
-import {pointTypes} from '../mock/point-types';
-import {destinations} from '../mock/destinations';
-import {CITY_NAMES} from '../mock/const';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
   EDITING: `EDITING`
 };
+
 export default class PointPresenter {
   constructor(pointsListContainer, changeData, changeMode) {
     this._pointsListContainer = pointsListContainer;
@@ -26,7 +24,7 @@ export default class PointPresenter {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFavClick = this._handleFavClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleResetClick = this._handleResetClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(pointData) {
@@ -36,17 +34,12 @@ export default class PointPresenter {
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(pointData);
-    this._pointEditComponent = new PointEditView({
-      pointData,
-      pointTypes,
-      destinations,
-      cities: CITY_NAMES
-    });
+    this._pointEditComponent = new PointEditView(pointData);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavClickHandler(this._handleFavClick);
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setResetHandler(this._handleResetClick);
+    this._pointEditComponent.setDeleteHandler(this._handleDeleteClick);
     this._pointEditComponent.setCloseHandler(this._handleCloseClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -98,7 +91,7 @@ export default class PointPresenter {
     this._switchToView();
   }
 
-  _handleResetClick() {
+  _handleDeleteClick() {
     this._switchToView();
   }
 
