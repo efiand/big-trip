@@ -5,7 +5,7 @@ import {SortType} from '../const';
 const DISABLED_SORTINGS = [`POINT`, `OFFER`];
 
 const createListMarkup = (activeSorting) => Object.keys(SortType).reduce((markup, sorting) => {
-  const sortingVal = SortType[sorting]
+  const sortingVal = SortType[sorting];
   const title = Utils.capitalize(sortingVal);
   const isActive = sorting === activeSorting;
   const isDisabled = DISABLED_SORTINGS.indexOf(sorting) > -1;
