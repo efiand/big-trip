@@ -1,19 +1,18 @@
-import dayjs from 'dayjs';
 import SortView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
 import PointPresenter from '../presenter/point';
-import {Render, Utils} from '../utils';
+import {Dates, Render, Utils} from '../utils';
 
 const DEFAULT_SORT_TYPE = `DEFAULT`;
 
 const sortPoints = {
   DEFAULT(pointA, pointB) {
-    return dayjs(pointA.startTime).diff(pointB.startTime);
+    return Dates.getDiff(pointA.startTime, pointB.startTime);
   },
   DURATION(pointA, pointB) {
-    const durationA = dayjs(pointA.finishTime).unix() - dayjs(pointA.startTime).unix();
-    const durationB = dayjs(pointB.finishTime).unix() - dayjs(pointB.startTime).unix();
+    const durationA = Dates.getTimestampDuration(pointA.finishTime, pointA.startTime);
+    const durationB = Dates.getTimestampDuration(pointB.finishTime, pointB.startTime);
 
     return durationA - durationB;
   },

@@ -1,24 +1,5 @@
-import dayjs from 'dayjs';
-import {Utils} from '../utils';
+import {Dates, Utils} from '../utils';
 import AbstractView from '../view/abstract';
-
-const formatDuration = (startInstance, finishInstance) => {
-  const minutes = finishInstance.diff(startInstance, `minute`);
-  const minuteStr = `${Utils.formatWithLead0(minutes % 60)}M`;
-
-  if (minutes < 60) {
-    return minuteStr;
-  }
-
-  const hours = finishInstance.diff(startInstance, `hour`);
-  const hourStr = `${hours % 24}H`;
-  if (hours < 24) {
-    return `${hourStr} ${minuteStr}`;
-  }
-
-  const days = finishInstance.diff(startInstance, `day`);
-  return `${days}D ${hourStr} ${minuteStr}`;
-};
 
 const createOfferItem = (template, offer) => {
   return `
@@ -51,15 +32,13 @@ export const createPointTemplate = ({
   price,
   isFavorite
 }) => {
-  const startDate = dayjs(startTime);
-  const finishDate = dayjs(finishTime);
   const {offers} = type;
 
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${startDate.format(`YYYY-MM-DD`)}">
-          ${startDate.format(`MMM DD`)}
+        <time class="event__date" datetime="${Dates.getISODate(startTime)}">
+          ${Dates.getHumanDate(startTime)}
         </time>
         <div class="event__type">
           <img
@@ -73,15 +52,15 @@ export const createPointTemplate = ({
         <h3 class="event__title">${Utils.capitalize(type.name)} ${destination.city}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${startDate.format()}">
-              ${startDate.format(`HH:mm`)}
+            <time class="event__start-time" datetime="${Dates.getISO(startTime)}">
+              ${Dates.getTime(startTime)}
             </time>
             &mdash;
-            <time class="event__end-time" datetime="${finishDate.format()}">
-              ${finishDate.format(`HH:mm`)}
+            <time class="event__end-time" datetime="${Dates.getISO(finishTime)}">
+              ${Dates.getTime(finishTime)}
             </time>
           </p>
-          <p class="event__duration">${formatDuration(startDate, finishDate)}</p>
+          <p class="event__duration">${Dates.getFormattedDuration(startTime, finishTime)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${price}</span>

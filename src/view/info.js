@@ -1,22 +1,18 @@
-import dayjs from 'dayjs';
 import AbstractView from '../view/abstract';
+import {Dates} from '../utils';
 
 const createInfoTemplate = (points) => {
   const cities = Array.from(new Set(points.map((pointData) => {
     return pointData.destination.city;
   })));
-  const startDate = dayjs(points[0].startTime);
-  const finishDate = dayjs(points[points.length - 1].finishTime);
-  const isEqualMonths = startDate.month() === finishDate.month();
-  const startDateStr = startDate.format(`MMM DD`);
-  const finishDateStr = finishDate.format(isEqualMonths ? `DD` : `MMM DD`);
+  const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].finishTime);
 
   return `
     <section class="trip-main__trip-info trip-info">
       <div class="trip-info__main">
         <h1 class="trip-info__title">${cities.join(` &mdash; `)}</h1>
         <p class="trip-info__dates">
-          ${startDateStr}&nbsp;&mdash;&nbsp;${finishDateStr}
+          ${datesRange.start}&nbsp;&mdash;&nbsp;${datesRange.finish}
         </p>
       </div>
     </section>

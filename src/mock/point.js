@@ -1,12 +1,10 @@
-import dayjs from 'dayjs';
-import {Random} from '../utils';
+import {Dates, Random} from '../utils';
 import {POINT_TYPES, PRICE_RANGE, CITY_NAMES} from './const';
 import {pointTypes} from './point-types';
 import {destinations} from './destinations';
 
 const DURATION_RANGE = [10, 60 * 24 * 3]; // для выбора случайной длительности от 10 мин. до 3 сут.
-const MINUTE_NAME = `minute`;
-let tempTime = dayjs().add(Random.getInt(...DURATION_RANGE), MINUTE_NAME);
+let tempTime = Dates.addMinutes(Random.getInt(...DURATION_RANGE));
 
 export const generatePoint = () => {
   // Начало следующего мероприятия совпадает с окончанием ранее сгенерированного
@@ -14,7 +12,7 @@ export const generatePoint = () => {
   const startTime = tempTime.toISOString();
 
   // Добавляем к счетчику времени случайную продолжительность
-  tempTime = tempTime.add(Random.getInt(...DURATION_RANGE), MINUTE_NAME);
+  tempTime = Dates.addMinutes(Random.getInt(...DURATION_RANGE), tempTime);
 
   const typeName = Random.getItem(POINT_TYPES);
   const cityName = Random.getItem(CITY_NAMES);

@@ -5,7 +5,7 @@ import {destinations} from '../mock/destinations';
 import {CITY_NAMES} from '../mock/const';
 
 const getDefaultData = (type, destination) => {
-  const startTime = Dates.getNowISO();
+  const startTime = Dates.getISO(new Date());
 
   return {
     id: 0, // для постфикса связки лейбла и инпута
