@@ -1,8 +1,17 @@
-import {Dates, Utils} from '../utils';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from '../view/smart';
 import {pointTypes} from '../mock/point-types';
 import {destinations} from '../mock/destinations';
 import {CITY_NAMES} from '../mock/const';
+import {Dates, Utils} from '../utils';
+
+const KEY_24_HR = `time_24hr`;
+const DATEPICKER_DEFAULTS = {
+  dateFormat: `d/m/y H:i`,
+  enableTime: true,
+  [KEY_24_HR]: true
+};
 
 const getDefaultData = (type, destination) => {
   const startTime = Dates.getISO(new Date());
@@ -76,7 +85,7 @@ const createPointEditTemplate = (pointData = null) => {
   const {id, type, destination, startTime, finishTime, price} = pointData;
   const {offers, name: typeName} = type;
   const {city, description, photos} = destination;
-  const isSubmitDisabled = !city;
+  const isSubmitDisabled = !city || !startTime || !finishTime;
 
   return `
     <li class="trip-events__item">
@@ -194,11 +203,15 @@ export default class PointEditView extends SmartView {
     super();
 
     this._data = PointEditView.parsePointToData(point);
+    this._datepickerStart = null;
+    this._datepickerFinish = null;
 
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
+    this._changeFinishDateHandler = this._changeFinishDateHandler.bind(this);
     this._changeOfferHandler = this._changeOfferHandler.bind(this);
     this._changePriceHandler = this._changePriceHandler.bind(this);
     this._changePointTypeHandler = this._changePointTypeHandler.bind(this);
+    this._changeStartDateHandler = this._changeStartDateHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteHandler = this._deleteHandler.bind(this);
     this._inputDestinationHandler = this._inputDestinationHandler.bind(this);
@@ -209,6 +222,14 @@ export default class PointEditView extends SmartView {
 
   get _closeControl() {
     return this._form.querySelector(`.event__rollup-btn`);
+  }
+
+  get _dateFinishField() {
+    return this._form.querySelector(`[name="event-end-time"]`);
+  }
+
+  get _dateStartField() {
+    return this._form.querySelector(`[name="event-start-time"]`);
   }
 
   get _destinationField() {
@@ -238,6 +259,12 @@ export default class PointEditView extends SmartView {
     this.updateData({
       destination
     });
+  }
+
+  _changeFinishDateHandler([userDate]) {
+    this.updateData({
+      finishTime: Dates.humanize(userDate)
+    }, null);
   }
 
   _changeOfferHandler(evt) {
@@ -271,6 +298,12 @@ export default class PointEditView extends SmartView {
     }, null);
   }
 
+  _changeStartDateHandler([userDate]) {
+    this.updateData({
+      startTime: Dates.humanize(userDate)
+    }, null);
+  }
+
   _closeClickHandler(evt) {
     evt.preventDefault();
     this._callback.close();
@@ -290,6 +323,19 @@ export default class PointEditView extends SmartView {
     }, destination.description ? this.updateELement : null);
   }
 
+  _setFinishDatepicker() {
+    if (this._datepickerFinish) {
+      // при обновлении удаляем вспомогательные элементы, создаваемые при инициализации
+      this._datepickerFinish.destroy();
+      this._datepickerFinish = null;
+    }
+
+    this._datepickerFinish = flatpickr(this._dateFinishField, Object.assign({}, DATEPICKER_DEFAULTS, {
+      defaultDate: this._data.finishTime,
+      onChange: this._changeFinishDateHandler
+    }));
+  }
+
   _setInnerHandlers() {
     for (const radioBtn of this._typeRadioBtns) {
       radioBtn.addEventListener(`change`, this._changePointTypeHandler);
@@ -302,6 +348,22 @@ export default class PointEditView extends SmartView {
     this._destinationField.addEventListener(`input`, this._inputDestinationHandler);
     this._destinationField.addEventListener(`change`, this._changeDestinationHandler);
     this._priceField.addEventListener(`change`, this._changePriceHandler);
+
+    this._setStartDatepicker();
+    this._setFinishDatepicker();
+  }
+
+  _setStartDatepicker() {
+    if (this._datepickerStart) {
+      // при обновлении удаляем вспомогательные элементы, создаваемые при инициализации
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    this._datepickerStart = flatpickr(this._dateStartField, Object.assign({}, DATEPICKER_DEFAULTS, {
+      defaultDate: this._data.startTime,
+      onChange: this._changeStartDateHandler
+    }));
   }
 
   _submitHandler(evt) {
