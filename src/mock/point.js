@@ -26,7 +26,7 @@ export const generatePoint = () => {
     type,
     destination: destinations.find(({city}) => city === cityName),
     startTime,
-    finishTime: tempTime.toISOString(),
+    endTime: tempTime.toISOString(),
     isFavorite: Boolean(Random.getInt()),
     price: Random.getInt(...PRICE_RANGE)
   };

@@ -1,6 +1,7 @@
 import PointView from '../view/point';
 import PointEditView from '../view/point-edit';
-import {Render} from '../utils';
+import {Render, Dates} from '../utils';
+import {UserAction, UpdateType} from '../const';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -15,7 +16,7 @@ export default class PointPresenter {
 
     this._pointComponent = null;
     this._pointEditComponent = null;
-    this._pointData = {};
+    this._point = {};
     this._mode = Mode.DEFAULT;
 
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
@@ -24,17 +25,16 @@ export default class PointPresenter {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFavClick = this._handleFavClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(pointData) {
-    this._pointData = pointData;
+  init(point) {
+    this._point = point;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
-    this._pointComponent = new PointView(pointData);
-    this._pointEditComponent = new PointEditView(pointData);
+    this._pointComponent = new PointView(point);
+    this._pointEditComponent = new PointEditView(point);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavClickHandler(this._handleFavClick);
@@ -75,7 +75,7 @@ export default class PointPresenter {
   }
 
   _handleDeleteClick() {
-    this._switchToView();
+    this._changeData(UserAction.DELETE_POINT, UpdateType.MAJOR, this._point);
   }
 
   _handleEditClick() {
@@ -83,15 +83,17 @@ export default class PointPresenter {
   }
 
   _handleFavClick() {
-    this._changeData(Object.assign({}, this._pointData, {isFavorite: !this._pointData.isFavorite}));
+    const updatedPoint = Object.assign({}, this._point, {isFavorite: !this._point.isFavorite});
+    this._changeData(UserAction.UPDATE_POINT, UpdateType.PATCH, updatedPoint);
   }
 
-  _handleFormSubmit(pointData) {
-    this._changeData(pointData);
-    this._switchToView();
-  }
+  _handleFormSubmit(update) {
+    // Проверяем, изменились ли данные, которые попадают под фильтрацию
+    const isStartTimeUpdated = !Dates.isEqual(this._point.startTime, update.startTime);
+    const isEndTimeUpdated = !Dates.isEqual(this._point.startTime, update.endTime);
+    const updateType = isStartTimeUpdated || isEndTimeUpdated ? UpdateType.MINOR : UpdateType.PATCH;
 
-  _handleDeleteClick() {
+    this._changeData(UserAction.UPDATE_POINT, updateType, update);
     this._switchToView();
   }
 

@@ -28,7 +28,7 @@ export const createPointTemplate = ({
   type,
   destination,
   startTime,
-  finishTime,
+  endTime,
   price,
   isFavorite
 }) => {
@@ -56,11 +56,11 @@ export const createPointTemplate = ({
               ${Dates.getTime(startTime)}
             </time>
             &mdash;
-            <time class="event__end-time" datetime="${Dates.getISO(finishTime)}">
-              ${Dates.getTime(finishTime)}
+            <time class="event__end-time" datetime="${Dates.getISO(endTime)}">
+              ${Dates.getTime(endTime)}
             </time>
           </p>
-          <p class="event__duration">${Dates.getFormattedDuration(startTime, finishTime)}</p>
+          <p class="event__duration">${Dates.getFormattedDuration(startTime, endTime)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${price}</span>

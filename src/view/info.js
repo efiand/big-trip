@@ -5,14 +5,14 @@ const createInfoTemplate = (points) => {
   const cities = Array.from(new Set(points.map((pointData) => {
     return pointData.destination.city;
   })));
-  const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].finishTime);
+  const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].endTime);
 
   return `
     <section class="trip-main__trip-info trip-info">
       <div class="trip-info__main">
         <h1 class="trip-info__title">${cities.join(` &mdash; `)}</h1>
         <p class="trip-info__dates">
-          ${datesRange.start}&nbsp;&mdash;&nbsp;${datesRange.finish}
+          ${datesRange.start}&nbsp;&mdash;&nbsp;${datesRange.end}
         </p>
       </div>
     </section>

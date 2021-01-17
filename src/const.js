@@ -18,3 +18,15 @@ export const RenderPosition = {
   BEFOREBEGIN: `beforebegin`,
   BEFOREEND: `beforeend`
 };
+
+export const UserAction = {
+  UPDATE_POINT: `UPDATE_POINT`,
+  ADD_POINT: `ADD_POINT`,
+  DELETE_POINT: `DELETE_POINT`
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`, // обновить часть списка, когда точка изменена
+  MINOR: `MINOR`, // обновить список, когда точки отсортированы или отфильтрованы
+  MAJOR: `MAJOR` // обновить весь экран - когда точка добавлена или удалена
+};

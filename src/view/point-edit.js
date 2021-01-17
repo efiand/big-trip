@@ -21,7 +21,7 @@ const getDefaultData = (type, destination) => {
     type,
     destination,
     startTime,
-    finishTime: startTime,
+    endTime: startTime,
     price: ``
   };
 };
@@ -82,10 +82,10 @@ const createPointEditTemplate = (pointData = null) => {
   if (addMode) {
     pointData = getDefaultData(pointTypes[0], destinations[0]);
   }
-  const {id, type, destination, startTime, finishTime, price} = pointData;
+  const {id, type, destination, startTime, endTime, price} = pointData;
   const {offers, name: typeName} = type;
   const {city, description, photos} = destination;
-  const isSubmitDisabled = !city || !startTime || !finishTime;
+  const isSubmitDisabled = !city || !startTime || !endTime;
 
   return `
     <li class="trip-events__item">
@@ -147,7 +147,7 @@ const createPointEditTemplate = (pointData = null) => {
               id="event-end-time-${id}"
               type="text"
               name="event-end-time"
-              value="${finishTime}"
+              value="${endTime}"
             />
           </div>
 
@@ -204,10 +204,10 @@ export default class PointEditView extends SmartView {
 
     this._data = PointEditView.parsePointToData(point);
     this._datepickerStart = null;
-    this._datepickerFinish = null;
+    this._datepickerEnd = null;
 
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
-    this._changeFinishDateHandler = this._changeFinishDateHandler.bind(this);
+    this._changeEndDateHandler = this._changeEndDateHandler.bind(this);
     this._changeOfferHandler = this._changeOfferHandler.bind(this);
     this._changePriceHandler = this._changePriceHandler.bind(this);
     this._changePointTypeHandler = this._changePointTypeHandler.bind(this);
@@ -224,7 +224,7 @@ export default class PointEditView extends SmartView {
     return this._form.querySelector(`.event__rollup-btn`);
   }
 
-  get _dateFinishField() {
+  get _dateEndField() {
     return this._form.querySelector(`[name="event-end-time"]`);
   }
 
@@ -252,6 +252,47 @@ export default class PointEditView extends SmartView {
     return this._form.querySelectorAll(`[name="event-type"]`);
   }
 
+  getTemplate() {
+    return createPointEditTemplate(this._data);
+  }
+
+  removeElement() {
+    // переопределяем метод родительского класса, чтобы удалялись ненужные календари
+    super.removeElement();
+
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseHandler(this._callback.close);
+    this.setDeleteHandler(this._callback.delete);
+    this.setSubmitHandler(this._callback.submit);
+  }
+
+  setCloseHandler(callback) {
+    this._callback.close = callback;
+    this._closeControl.addEventListener(`click`, this._closeClickHandler);
+  }
+
+  setDeleteHandler(callback) {
+    this._callback.delete = callback;
+    this._form.addEventListener(`reset`, this._deleteHandler);
+  }
+
+  setSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this._form.addEventListener(`submit`, this._submitHandler);
+  }
+
   _changeDestinationHandler(evt) {
     evt.preventDefault();
 
@@ -261,9 +302,9 @@ export default class PointEditView extends SmartView {
     });
   }
 
-  _changeFinishDateHandler([userDate]) {
+  _changeEndDateHandler([userDate]) {
     this.updateData({
-      finishTime: Dates.humanize(userDate)
+      endTime: Dates.humanize(userDate)
     }, null);
   }
 
@@ -323,16 +364,16 @@ export default class PointEditView extends SmartView {
     }, destination.description ? this.updateELement : null);
   }
 
-  _setFinishDatepicker() {
-    if (this._datepickerFinish) {
+  _setEndDatepicker() {
+    if (this._datepickerEnd) {
       // при обновлении удаляем вспомогательные элементы, создаваемые при инициализации
-      this._datepickerFinish.destroy();
-      this._datepickerFinish = null;
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
     }
 
-    this._datepickerFinish = flatpickr(this._dateFinishField, Object.assign({}, DATEPICKER_DEFAULTS, {
-      defaultDate: this._data.finishTime,
-      onChange: this._changeFinishDateHandler
+    this._datepickerEnd = flatpickr(this._dateEndField, Object.assign({}, DATEPICKER_DEFAULTS, {
+      defaultDate: this._data.endTime,
+      onChange: this._changeEndDateHandler
     }));
   }
 
@@ -350,7 +391,7 @@ export default class PointEditView extends SmartView {
     this._priceField.addEventListener(`change`, this._changePriceHandler);
 
     this._setStartDatepicker();
-    this._setFinishDatepicker();
+    this._setEndDatepicker();
   }
 
   _setStartDatepicker() {
@@ -371,32 +412,6 @@ export default class PointEditView extends SmartView {
     this._callback.submit(PointEditView.parseDataToPoint(this._data));
   }
 
-  getTemplate() {
-    return createPointEditTemplate(this._data);
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this.setCloseHandler(this._callback.close);
-    this.setDeleteHandler(this._callback.delete);
-    this.setSubmitHandler(this._callback.submit);
-  }
-
-  setCloseHandler(callback) {
-    this._callback.close = callback;
-    this._closeControl.addEventListener(`click`, this._closeClickHandler);
-  }
-
-  setDeleteHandler(callback) {
-    this._callback.delete = callback;
-    this._form.addEventListener(`reset`, this._deleteHandler);
-  }
-
-  setSubmitHandler(callback) {
-    this._callback.submit = callback;
-    this._form.addEventListener(`submit`, this._submitHandler);
-  }
-
   static getDestination(city) {
     city = city.trim();
     const destination = destinations.find((item) => item.city === city) || {
@@ -411,7 +426,7 @@ export default class PointEditView extends SmartView {
   static parsePointToData(point) {
     return Object.assign({}, point, {
       startTime: Dates.humanize(point.startTime),
-      finishTime: Dates.humanize(point.finishTime),
+      endTime: Dates.humanize(point.endTime),
       price: point.price.toString()
     });
   }
@@ -421,7 +436,7 @@ export default class PointEditView extends SmartView {
 
     return Object.assign({}, data, {
       startTime: Dates.unhumanize(data.startTime),
-      finishTime: Dates.unhumanize(data.finishTime),
+      endTime: Dates.unhumanize(data.endTime),
       price: isNaN(price) ? 0 : price
     });
   }
