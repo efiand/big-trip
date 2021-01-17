@@ -3,36 +3,44 @@ import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
 import PointPresenter from '../presenter/point';
 import {Dates, Render} from '../utils';
-import {UpdateType, UserAction} from '../const';
-
-const DEFAULT_SORT_TYPE = `DEFAULT`;
+import {FilterType, SortType, UpdateType, UserAction} from '../const';
 
 const sortPoints = {
-  DEFAULT(pointA, pointB) {
+  [SortType.DEFAULT](pointA, pointB) {
     return Dates.getDiff(pointA.startTime, pointB.startTime);
   },
-  DURATION(pointA, pointB) {
+  [SortType.DURATION](pointA, pointB) {
     const durationA = Dates.getTimestampDuration(pointA.endTime, pointA.startTime);
     const durationB = Dates.getTimestampDuration(pointB.endTime, pointB.startTime);
 
     return durationA - durationB;
   },
-  PRICE(pointA, pointB) {
+  [SortType.PRICE](pointA, pointB) {
     return pointA.price - pointB.price;
   }
 };
 
+const filterPoints = {
+  [FilterType.FUTURE](point) {
+    return Dates.getDiff(point.startTime) >= 0;
+  },
+  [FilterType.PAST](point) {
+    return Dates.getDiff(point.endTime) < 0;
+  }
+};
+
 export default class TripPresenter {
-  constructor(tripContainer, pointsModel) {
+  constructor(tripContainer, pointsModel, filterModel) {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
+    this._filterModel = filterModel;
 
     this._sortComponent = null;
     this._listComponent = new PointsListView();
     this._noPointsComponent = new NoPointsView();
 
     this._pointPresenters = {};
-    this._currentSortType = DEFAULT_SORT_TYPE;
+    this._currentSortType = SortType.DEFAULT;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -40,6 +48,7 @@ export default class TripPresenter {
     this._handleViewAction = this._handleViewAction.bind(this);
 
     this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -55,14 +64,24 @@ export default class TripPresenter {
     this._pointPresenters = {};
   }
 
+  _clearNoPoints() {
+    Render.remove(this._noPointsComponent);
+  }
+
   _clearTrip() {
     // тут будет еще что-то, по всей видимости
     this._clearSort();
+    this._clearNoPoints();
     this._clearList();
   }
 
   _getPoints() {
-    return this._pointsModel.getPoints().slice().sort(sortPoints[this._currentSortType]);
+    const filterType = this._filterModel.getFilter();
+    const points = this._pointsModel.getPoints();
+
+    const filteredPoints = filterType === FilterType.DEFAULT ? points : points.filter(filterPoints[filterType]);
+
+    return filteredPoints.sort(sortPoints[this._currentSortType]);
   }
 
   _handleModeChange() {

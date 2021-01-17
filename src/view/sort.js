@@ -2,28 +2,27 @@ import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 import {SortType} from '../const';
 
-const DISABLED_SORTINGS = [`POINT`, `OFFER`];
+const DISABLED_SORTINGS = [`point`, `offer`];
 
-const createListMarkup = (activeSorting) => Object.keys(SortType).reduce((markup, sorting) => {
-  const sortingVal = SortType[sorting];
-  const title = Utils.capitalize(sortingVal);
+const createListMarkup = (activeSorting) => Object.values(SortType).reduce((markup, sorting) => {
+  const title = Utils.capitalize(sorting);
   const isActive = sorting === activeSorting;
   const isDisabled = DISABLED_SORTINGS.indexOf(sorting) > -1;
 
   return `
     ${markup}
-    <div class="trip-sort__item trip-sort__item--${sortingVal}">
+    <div class="trip-sort__item trip-sort__item--${sorting}">
       <input
-        id="sort-${sortingVal}"
+        id="sort-${sorting}"
         class="trip-sort__input visually-hidden"
         type="radio"
         name="trip-sort"
-        value="sort-${sortingVal}"
+        value="sort-${sorting}"
         data-sort-type="${sorting}"
         ${isActive ? `checked` : ``}
         ${isDisabled ? `disabled` : ``}
       />
-      <label class="trip-sort__btn" for="sort-${sortingVal}">
+      <label class="trip-sort__btn" for="sort-${sorting}">
         ${title}
       </label>
     </div>

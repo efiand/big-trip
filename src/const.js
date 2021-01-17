@@ -2,7 +2,11 @@
 
 export const NUMERAL_SYSTEM_BASE = 10;
 
-export const FILTERS = [`everything`, `future`, `past`];
+export const FilterType = {
+  DEFAULT: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
 
 export const SortType = {
   DEFAULT: `day`,

@@ -37,6 +37,7 @@ html {
   height: 100%; }
 
 body {
+  overflow-y: scroll;
   padding: 0;
   margin: 0;
   -webkit-font-smoothing: antialiased;

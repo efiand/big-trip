@@ -13,7 +13,7 @@ export default class Dates {
     return instance.add(minutes, MINUTE_NAME);
   }
 
-  static getDiff(dateA, dateB) {
+  static getDiff(dateA, dateB = dayjs().format()) {
     return dayjs(dateA).diff(dateB);
   }
 

@@ -6,6 +6,11 @@ const createInfoTemplate = (points) => {
     return pointData.destination.city;
   })));
   const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].endTime);
+  const cost = points.reduce((total, {price, type: {offers}}) => {
+    return total + price + offers.reduce((offersTotal, offer) => {
+      return offersTotal + (offer.isChecked ? offer.price : 0);
+    }, 0);
+  }, 0);
 
   return `
     <section class="trip-main__trip-info trip-info">
@@ -15,6 +20,9 @@ const createInfoTemplate = (points) => {
           ${datesRange.start}&nbsp;&mdash;&nbsp;${datesRange.end}
         </p>
       </div>
+      <p class="trip-info__cost">
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${cost}</span>
+      </p>
     </section>
   `;
 };
