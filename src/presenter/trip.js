@@ -2,6 +2,7 @@ import SortView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
 import PointPresenter from '../presenter/point';
+import PointNewPresenter from '../presenter/point-new';
 import {Dates, Render} from '../utils';
 import {FilterType, SortType, UpdateType, UserAction} from '../const';
 
@@ -36,6 +37,7 @@ export default class TripPresenter {
     this._filterModel = filterModel;
 
     this._sortComponent = null;
+    this._newButtonComponent = null;
     this._listComponent = new PointsListView();
     this._noPointsComponent = new NoPointsView();
 
@@ -49,9 +51,15 @@ export default class TripPresenter {
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction);
   }
 
-  init() {
+  init(newButtonComponent) {
+    this._newButtonComponent = newButtonComponent;
+
+    this._newButtonComponent.setClickHandler(() => this._createPoint());
+
     this._renderTrip();
   }
 
@@ -62,6 +70,8 @@ export default class TripPresenter {
   _clearList() {
     Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
     this._pointPresenters = {};
+
+    this._pointNewPresenter.destroy();
   }
 
   _clearNoPoints() {
@@ -75,6 +85,12 @@ export default class TripPresenter {
     this._clearList();
   }
 
+  _createPoint() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.DEFAULT);
+    this._pointNewPresenter.init(this._newButtonComponent);
+  }
+
   _getPoints() {
     const filterType = this._filterModel.getFilter();
     const points = this._pointsModel.getPoints();
@@ -85,6 +101,8 @@ export default class TripPresenter {
   }
 
   _handleModeChange() {
+    this._pointNewPresenter.destroy();
+
     Object.values(this._pointPresenters).forEach((presenter) => presenter.resetView());
   }
 

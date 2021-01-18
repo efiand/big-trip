@@ -63,6 +63,12 @@ export default class PointPresenter {
     Render.remove(this._pointEditComponent);
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._switchToView();
+    }
+  }
+
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
@@ -108,11 +114,5 @@ export default class PointPresenter {
     Render.replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._switchToView();
-    }
   }
 }

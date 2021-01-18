@@ -13,11 +13,12 @@ const DATEPICKER_DEFAULTS = {
   [KEY_24_HR]: true
 };
 
-const getDefaultData = (pointType, destination) => {
+const getDefaultData = () => {
+  const [pointType] = pointTypes;
+  const [destination] = destinations;
   const startTime = Dates.getISO(new Date());
 
   return {
-    id: 0, // для постфикса связки лейбла и инпута
     pointType,
     destination,
     startTime,
@@ -77,12 +78,9 @@ const createPhotosList = (pictures) => pictures.reduce((template, {src, descript
   return `${template}<img class="event__photo" src="${src}" alt="${description}">`;
 }, ``);
 
-const createPointEditTemplate = (pointData = null) => {
-  const addMode = !pointData;
-  if (addMode) {
-    pointData = getDefaultData(pointTypes[0], destinations[0]);
-  }
-  const {id, pointType, destination, startTime, endTime, basePrice} = pointData;
+const createPointEditTemplate = (pointData) => {
+  const addMode = !pointData.id;
+  const {id = 0, pointType, destination, startTime, endTime, basePrice} = pointData;
   const {offers, type: typeName} = pointType;
   const {name: city, description, pictures} = destination;
   const isSubmitDisabled = !city || !startTime || !endTime;
@@ -199,7 +197,7 @@ const createPointEditTemplate = (pointData = null) => {
 };
 
 export default class PointEditView extends SmartView {
-  constructor(point) {
+  constructor(point = getDefaultData()) {
     super();
 
     this._data = PointEditView.parsePointToData(point);
