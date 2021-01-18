@@ -23,7 +23,7 @@ const getDefaultData = () => {
     destination,
     startTime,
     endTime: startTime,
-    basePrice: 0
+    basePrice: ``
   };
 };
 
@@ -78,12 +78,18 @@ const createPhotosList = (pictures) => pictures.reduce((template, {src, descript
   return `${template}<img class="event__photo" src="${src}" alt="${description}">`;
 }, ``);
 
-const createPointEditTemplate = (pointData) => {
-  const addMode = !pointData.id;
-  const {id = 0, pointType, destination, startTime, endTime, basePrice} = pointData;
+const createPointEditTemplate = ({
+  id = 0,
+  isNewPoint,
+  pointType,
+  destination,
+  startTime,
+  endTime,
+  basePrice
+}) => {
   const {offers, type: typeName} = pointType;
   const {name: city, description, pictures} = destination;
-  const isSubmitDisabled = !city || !startTime || !endTime;
+  const isSubmitDisabled = !city || !startTime || !endTime || !basePrice;
 
   return `
     <li class="trip-events__item">
@@ -168,9 +174,9 @@ const createPointEditTemplate = (pointData) => {
             ${isSubmitDisabled ? `disabled` : ``}
           >Save</button>
           <button class="event__reset-btn" type="reset">
-            ${addMode ? `Cancel` : `Delete`}
+            ${isNewPoint ? `Cancel` : `Delete`}
           </button>
-          ${addMode ? `` : `
+          ${isNewPoint ? `` : `
             <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
             </button>
@@ -207,12 +213,12 @@ export default class PointEditView extends SmartView {
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
     this._changeEndDateHandler = this._changeEndDateHandler.bind(this);
     this._changeOfferHandler = this._changeOfferHandler.bind(this);
-    this._changePriceHandler = this._changePriceHandler.bind(this);
     this._changePointTypeHandler = this._changePointTypeHandler.bind(this);
     this._changeStartDateHandler = this._changeStartDateHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteHandler = this._deleteHandler.bind(this);
     this._inputDestinationHandler = this._inputDestinationHandler.bind(this);
+    this._inputPriceHandler = this._inputPriceHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
 
     this._setInnerHandlers();
@@ -246,6 +252,10 @@ export default class PointEditView extends SmartView {
     return this._form.querySelector(`[name="event-price"]`);
   }
 
+  get _submitControl() {
+    return this._form.querySelector(`[type="submit"]`);
+  }
+
   get _typeRadioBtns() {
     return this._form.querySelectorAll(`[name="event-type"]`);
   }
@@ -277,6 +287,10 @@ export default class PointEditView extends SmartView {
   }
 
   setCloseHandler(callback) {
+    if (this._data.isNewPoint) {
+      return;
+    }
+
     this._callback.close = callback;
     this._closeControl.addEventListener(`click`, this._closeClickHandler);
   }
@@ -295,6 +309,11 @@ export default class PointEditView extends SmartView {
     evt.preventDefault();
 
     const destination = PointEditView.getDestination(evt.target.value);
+
+    if (!destination.name) {
+      evt.target.value = ``;
+    }
+
     this.updateData({
       destination
     });
@@ -329,14 +348,6 @@ export default class PointEditView extends SmartView {
     });
   }
 
-  _changePriceHandler(evt) {
-    evt.preventDefault();
-
-    this.updateData({
-      basePrice: evt.target.value
-    }, null);
-  }
-
   _changeStartDateHandler([userDate]) {
     this.updateData({
       startTime: Dates.humanize(userDate)
@@ -360,6 +371,20 @@ export default class PointEditView extends SmartView {
     this.updateData({
       destination
     }, destination.description ? this.updateELement : null);
+  }
+
+  _inputPriceHandler(evt) {
+    evt.preventDefault();
+
+    const value = parseInt(evt.target.value.trim(), 10);
+    this._currentPrice = isNaN(value) || !value ? `` : value.toString();
+    evt.target.value = this._currentPrice;
+
+    this.updateData({
+      basePrice: this._currentPrice
+    }, () => {
+      this._submitControl.disabled = !this._currentPrice;
+    });
   }
 
   _setEndDatepicker() {
@@ -386,7 +411,7 @@ export default class PointEditView extends SmartView {
 
     this._destinationField.addEventListener(`input`, this._inputDestinationHandler);
     this._destinationField.addEventListener(`change`, this._changeDestinationHandler);
-    this._priceField.addEventListener(`change`, this._changePriceHandler);
+    this._priceField.addEventListener(`input`, this._inputPriceHandler);
 
     this._setStartDatepicker();
     this._setEndDatepicker();
@@ -407,13 +432,18 @@ export default class PointEditView extends SmartView {
 
   _submitHandler(evt) {
     evt.preventDefault();
+
+    if (!this._data.destination.name || !this._data.basePrice) {
+      return;
+    }
+
     this._callback.submit(PointEditView.parseDataToPoint(this._data));
   }
 
   static getDestination(city) {
     city = city.trim();
     const destination = destinations.find(({name}) => name === city) || {
-      name: city,
+      name: ``,
       description: null,
       pictures: null
     };
@@ -421,21 +451,20 @@ export default class PointEditView extends SmartView {
     return destination;
   }
 
+  static parseDataToPoint(data) {
+    delete data.isNewPoint;
+
+    return Object.assign({}, data, {
+      startTime: Dates.unhumanize(data.startTime),
+      endTime: Dates.unhumanize(data.endTime)
+    });
+  }
+
   static parsePointToData(point) {
     return Object.assign({}, point, {
       startTime: Dates.humanize(point.startTime),
       endTime: Dates.humanize(point.endTime),
-      basePrice: point.basePrice.toString()
-    });
-  }
-
-  static parseDataToPoint(data) {
-    const price = parseInt(data.basePrice.trim(), 10);
-
-    return Object.assign({}, data, {
-      startTime: Dates.unhumanize(data.startTime),
-      endTime: Dates.unhumanize(data.endTime),
-      basePrice: isNaN(price) ? 0 : price
+      isNewPoint: !point.id
     });
   }
 }

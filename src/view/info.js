@@ -7,7 +7,7 @@ const createInfoTemplate = (points) => {
   })));
   const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].endTime);
   const cost = points.reduce((total, {basePrice, pointType: {offers}}) => {
-    return total + basePrice + offers.reduce((offersTotal, offer) => {
+    return total + parseInt(basePrice, 10) + offers.reduce((offersTotal, offer) => {
       return offersTotal + (offer.isChecked ? offer.price : 0);
     }, 0);
   }, 0);
