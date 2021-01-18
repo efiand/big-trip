@@ -1,4 +1,3 @@
-import { pointTypes } from '../mock/point-types';
 import {Dates, Utils} from '../utils';
 import AbstractView from '../view/abstract';
 

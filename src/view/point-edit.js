@@ -13,7 +13,7 @@ const DATEPICKER_DEFAULTS = {
   [KEY_24_HR]: true
 };
 
-const getDefaultData = (type, destination) => {
+const getDefaultData = (pointType, destination) => {
   const startTime = Dates.getISO(new Date());
 
   return {
