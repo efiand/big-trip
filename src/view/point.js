@@ -1,3 +1,4 @@
+import { pointTypes } from '../mock/point-types';
 import {Dates, Utils} from '../utils';
 import AbstractView from '../view/abstract';
 
@@ -5,8 +6,8 @@ const createOfferItem = (template, offer) => {
   return `
     ${template}
     <li class="event__offer">
-      <span class="event__offer-title">${offer.name}</span>
-      &nbsp;&plus;&euro;&nbsp;&nbsp;<span class="event__offer-price">${offer.price} </span>
+      <span class="event__offer-title">${offer.title}</span>
+      &nbsp;&plus;&euro;&nbsp;&nbsp;<span class="event__offer-price">${offer.price}</span>
     </li>
   `;
 };
@@ -25,14 +26,14 @@ const createOffersList = (offers) => {
 };
 
 export const createPointTemplate = ({
-  type,
+  pointType,
   destination,
   startTime,
   endTime,
-  price,
+  basePrice,
   isFavorite
 }) => {
-  const {offers} = type;
+  const {offers} = pointType;
 
   return `
     <li class="trip-events__item">
@@ -45,11 +46,11 @@ export const createPointTemplate = ({
             class="event__type-icon"
             width="42"
             height="42"
-            src="img/icons/${type.name}.png"
+            src="img/icons/${pointType.type}.png"
             alt="Event type icon"
           />
         </div>
-        <h3 class="event__title">${Utils.capitalize(type.name)} ${destination.city}</h3>
+        <h3 class="event__title">${Utils.capitalize(pointType.type)} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${Dates.getISO(startTime)}">
@@ -63,7 +64,7 @@ export const createPointTemplate = ({
           <p class="event__duration">${Dates.getFormattedDuration(startTime, endTime)}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         ${createOffersList(offers)}
         <button class="event__favorite-btn ${isFavorite ? `event__favorite-btn--active` : ``}" type="button">

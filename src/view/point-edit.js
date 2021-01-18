@@ -18,29 +18,29 @@ const getDefaultData = (type, destination) => {
 
   return {
     id: 0, // для постфикса связки лейбла и инпута
-    type,
+    pointType,
     destination,
     startTime,
     endTime: startTime,
-    price: ``
+    basePrice: 0
   };
 };
 
-const createPointTypes = (typeName) => pointTypes.reduce((template, {name}, i) => {
-  const checkedAttr = name === typeName ? `checked` : ``;
+const createPointTypes = (typeName) => pointTypes.reduce((template, {type}, i) => {
+  const checkedAttr = type === typeName ? `checked` : ``;
   return `
     ${template}
     <div class="event__type-item">
       <input
-        id="event-type-${name}-${i + 1}"
+        id="event-type-${type}-${i + 1}"
         class="event__type-input visually-hidden"
         type="radio"
         name="event-type"
-        value="${name}"
+        value="${type}"
         ${checkedAttr}
       />
-      <label class="event__type-label event__type-label--${name}" for="event-type-${name}-${i + 1}">
-        ${Utils.capitalize(name)}
+      <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${i + 1}">
+        ${Utils.capitalize(type)}
       </label>
     </div>
   `;
@@ -51,7 +51,7 @@ const createCitiesList = () => CITY_NAMES.reduce((template, cityName) => {
 }, ``);
 
 const createOffersList = (offers) => offers.reduce((template, offer, i) => {
-  const {name, alias, price: offerPrice, isChecked} = offer;
+  const {title, alias, price: offerPrice, isChecked} = offer;
   const checkedAttr = isChecked ? `checked` : ``;
 
   return `
@@ -65,7 +65,7 @@ const createOffersList = (offers) => offers.reduce((template, offer, i) => {
         ${checkedAttr}
       />
       <label class="event__offer-label" for="event-offer-${alias}-${i + 1}">
-        <span class="event__offer-title">${name}</span>
+        <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offerPrice}</span>
       </label>
@@ -73,8 +73,8 @@ const createOffersList = (offers) => offers.reduce((template, offer, i) => {
   `;
 }, ``);
 
-const createPhotosList = (photos) => photos.reduce((template, photo) => {
-  return `${template}<img class="event__photo" src="${photo}" alt="Event photo">`;
+const createPhotosList = (pictures) => pictures.reduce((template, {src, description}) => {
+  return `${template}<img class="event__photo" src="${src}" alt="${description}">`;
 }, ``);
 
 const createPointEditTemplate = (pointData = null) => {
@@ -82,9 +82,9 @@ const createPointEditTemplate = (pointData = null) => {
   if (addMode) {
     pointData = getDefaultData(pointTypes[0], destinations[0]);
   }
-  const {id, type, destination, startTime, endTime, price} = pointData;
-  const {offers, name: typeName} = type;
-  const {city, description, photos} = destination;
+  const {id, pointType, destination, startTime, endTime, basePrice} = pointData;
+  const {offers, type: typeName} = pointType;
+  const {name: city, description, pictures} = destination;
   const isSubmitDisabled = !city || !startTime || !endTime;
 
   return `
@@ -111,7 +111,7 @@ const createPointEditTemplate = (pointData = null) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointTypes(type)}
+                ${createPointTypes(pointType)}
               </fieldset>
             </div>
           </div>
@@ -160,7 +160,7 @@ const createPointEditTemplate = (pointData = null) => {
               class="event__input event__input--price"
               id="event-price-${id}"
               type="text"
-              name="event-price" value="${price}"
+              name="event-price" value="${basePrice}"
             />
           </div>
 
@@ -184,12 +184,12 @@ const createPointEditTemplate = (pointData = null) => {
             <div class="event__available-offers">${createOffersList(offers)}</div>
           </section>` : ``}
 
-          ${description && photos ? `<section class="event__section event__section--destination">
+          ${description && pictures ? `<section class="event__section event__section--destination">
             <h3 class="event__section-title event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${description}</p>
 
             <div class="event__photos-container">
-              <div class="event__photos-tape">${createPhotosList(photos)}</div>
+              <div class="event__photos-tape">${createPhotosList(pictures)}</div>
             </div>
           </section>` : ``}
         </section>
@@ -311,13 +311,13 @@ export default class PointEditView extends SmartView {
   _changeOfferHandler(evt) {
     evt.preventDefault();
     const alias = evt.target.name.replace(`event-offer-`, ``);
-    const {type} = this._data;
-    const offers = type.offers.slice();
+    const {pointType} = this._data;
+    const offers = pointType.offers.slice();
     const currentIndex = offers.findIndex((item) => item.alias === alias);
     offers[currentIndex].isChecked = evt.target.checked;
 
     this.updateData({
-      type: Object.assign({}, type, {
+      pointType: Object.assign({}, pointType, {
         offers
       })
     }, null);
@@ -327,7 +327,7 @@ export default class PointEditView extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      type: pointTypes.find((type) => type.name === evt.target.value)
+      pointType: pointTypes.find(({type}) => type === evt.target.value)
     });
   }
 
@@ -335,7 +335,7 @@ export default class PointEditView extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      price: evt.target.value
+      basePrice: evt.target.value
     }, null);
   }
 
@@ -414,10 +414,10 @@ export default class PointEditView extends SmartView {
 
   static getDestination(city) {
     city = city.trim();
-    const destination = destinations.find((item) => item.city === city) || {
-      city,
+    const destination = destinations.find(({name}) => name === city) || {
+      name: city,
       description: null,
-      photos: null
+      pictures: null
     };
 
     return destination;
@@ -427,17 +427,17 @@ export default class PointEditView extends SmartView {
     return Object.assign({}, point, {
       startTime: Dates.humanize(point.startTime),
       endTime: Dates.humanize(point.endTime),
-      price: point.price.toString()
+      basePrice: point.basePrice.toString()
     });
   }
 
   static parseDataToPoint(data) {
-    const price = parseInt(data.price.trim(), 10);
+    const price = parseInt(data.basePrice.trim(), 10);
 
     return Object.assign({}, data, {
       startTime: Dates.unhumanize(data.startTime),
       endTime: Dates.unhumanize(data.endTime),
-      price: isNaN(price) ? 0 : price
+      basePrice: isNaN(price) ? 0 : price
     });
   }
 }
