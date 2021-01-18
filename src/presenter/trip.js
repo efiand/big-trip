@@ -17,7 +17,7 @@ const sortPoints = {
     return durationA - durationB;
   },
   [SortType.PRICE](pointA, pointB) {
-    return pointA.price - pointB.price;
+    return pointA.basePrice - pointB.basePrice;
   }
 };
 
@@ -64,6 +64,7 @@ export default class TripPresenter {
   }
 
   _clearSort() {
+    this._currentSortType = SortType.DEFAULT;
     Render.remove(this._sortComponent);
   }
 
@@ -109,16 +110,13 @@ export default class TripPresenter {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // обновление одной точки маршрута
         this._pointPresenters[data.id].init(data);
         break;
       case UpdateType.MINOR:
-        // обновление списка (при сортировке или фильтрации)
         this._clearList();
         this._renderPoints(this._getPoints().slice());
         break;
       case UpdateType.MAJOR:
-        // обновление всего экрана (при добавлении или удалении точки)
         this._clearTrip();
         this._renderTrip();
         break;
