@@ -4,13 +4,22 @@ import {Utils} from '.';
 
 const HUMAN_FORMAT = `DD/MM/YY HH:mm`;
 const SHORT_HUMAN_FORMAT = `MMM DD`;
-const MINUTE_NAME = `minute`;
+const MS_IN_DAY = 86400000;
+const Name = {
+  MINUTE: `minute`,
+  DAY: `day`,
+  HOUR: `hour`
+};
 
 dayjs.extend(customParseFormat);
 
 export default class Dates {
   static addMinutes(minutes, instance = dayjs()) {
-    return instance.add(minutes, MINUTE_NAME);
+    return instance.add(minutes, Name.MINUTE);
+  }
+
+  static getDaysFromMs(ms) {
+    return Math.ceil(ms / MS_IN_DAY);
   }
 
   static getDiff(dateA, dateB = dayjs().format()) {
@@ -20,20 +29,20 @@ export default class Dates {
   static getFormattedDuration(startDate, endDate) {
     const startInstance = dayjs(startDate);
     const endInstance = dayjs(endDate);
-    const minutes = endInstance.diff(startInstance, `minute`);
+    const minutes = endInstance.diff(startInstance, Name.MINUTE);
     const minuteStr = `${Utils.formatWithLead0(minutes % 60)}M`;
 
     if (minutes < 60) {
       return minuteStr;
     }
 
-    const hours = endInstance.diff(startInstance, `hour`);
+    const hours = endInstance.diff(startInstance, Name.HOUR);
     const hourStr = `${Utils.formatWithLead0(hours % 24)}H`;
     if (hours < 24) {
       return `${hourStr} ${minuteStr}`;
     }
 
-    const days = endInstance.diff(startInstance, `day`);
+    const days = endInstance.diff(startInstance, Name.DAY);
     return `${Utils.formatWithLead0(days)}D ${hourStr} ${minuteStr}`;
   }
 

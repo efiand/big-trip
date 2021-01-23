@@ -7,10 +7,16 @@ export default class PointsModel extends Observer {
     this._points = [];
   }
 
+  get _notice() {
+    return {
+      points: this._points
+    };
+  }
+
   addPoint(updateType, update) {
     this._points = [update, ...this._points];
 
-    this._notify(updateType, update);
+    this._notify(updateType, update, this._notice);
   }
 
   deletePoint(updateType, update) {
@@ -21,7 +27,7 @@ export default class PointsModel extends Observer {
       ...this._points.slice(i + 1)
     ];
 
-    this._notify(updateType);
+    this._notify(updateType, update, this._notice);
   }
 
   getPoints() {
@@ -41,7 +47,7 @@ export default class PointsModel extends Observer {
       ...this._points.slice(i + 1)
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, update, this._notice);
   }
 
   _findUpdateIndex(update, mode = `update`) {

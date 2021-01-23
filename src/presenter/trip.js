@@ -62,6 +62,10 @@ export default class TripPresenter {
     this._tabsComponent = tabsComponent;
     this._statsComponent = statsComponent;
 
+    statsComponent.updateData({
+      points: this._pointsModel.getPoints()
+    });
+
     this._newButtonComponent.setClickHandler(() => {
       this._createPoint();
       this._tabsComponent.setDefault();
@@ -139,7 +143,7 @@ export default class TripPresenter {
     Object.values(this._pointPresenters).forEach((presenter) => presenter.resetView());
   }
 
-  _handleModelEvent(updateType, data) {
+  _handleModelEvent(updateType, data, notice) {
     switch (updateType) {
       case UpdateType.PATCH:
         this._pointPresenters[data.id].init(data);
@@ -152,6 +156,10 @@ export default class TripPresenter {
         this._destroy();
         this._create();
         break;
+    }
+
+    if (notice && notice.points) {
+      this._statsComponent.updateData(notice);
     }
   }
 

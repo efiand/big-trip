@@ -13,7 +13,7 @@ export default class Observer {
     });
   }
 
-  _notify(evt, payload) {
-    this._observers.forEach((observer) => observer(evt, payload));
+  _notify(evt, payload, notice = null) {
+    this._observers.forEach((observer) => observer(evt, payload, notice));
   }
 }
