@@ -26,7 +26,7 @@ const newButtonComponent = new NewButtonView();
 const tabsComponent = new TabsView();
 
 const infoPresenter = new InfoPresenter(tripHeaderElement, pointsModel);
-const filterPresenter = new FilterPresenter(tripControlsElement, filterModel);
+const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripMainElement, pointsModel, filterModel);
 
 Render.render(tripHeadingElement, tabsComponent, RenderPosition.AFTEREND);
