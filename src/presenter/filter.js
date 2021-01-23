@@ -10,7 +10,6 @@ export default class FilterPresenter {
     this._currentFilter = FilterType.DEFAULT;
 
     this._filterComponent = null;
-    this._isDisabled = false;
 
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -19,18 +18,12 @@ export default class FilterPresenter {
     this._pointsModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
-    if (!this._pointsModel.getPoints().length) {
-      this._currentFilter = FilterType.DEFAULT;
-      this._isDisabled = true;
-    } else {
-      this._currentFilter = this._filterModel.getFilter();
-      this._isDisabled = false;
-    }
+  init(isDisabled = false) {
+    this._currentFilter = isDisabled ? FilterType.DEFAULT : this._filterModel.getFilter();
 
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(this._currentFilter, this._isDisabled);
+    this._filterComponent = new FilterView(this._currentFilter, isDisabled);
     this._filterComponent.setChangeFilterTypeHandler(this._handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -51,6 +44,6 @@ export default class FilterPresenter {
   }
 
   _handleModelEvent() {
-    this.init();
+    this.init(!this._pointsModel.getPoints().length);
   }
 }
