@@ -1,6 +1,6 @@
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-import SmartView from '../view/smart';
+import SmartView from './smart';
 import {pointTypes} from '../mock/point-types';
 import {destinations} from '../mock/destinations';
 import {CITY_NAMES} from '../mock/const';

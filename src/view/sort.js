@@ -1,5 +1,5 @@
+import AbstractView from './abstract';
 import {Utils} from '../utils';
-import AbstractView from '../view/abstract';
 import {SortType} from '../const';
 
 const DISABLED_SORTINGS = [`point`, `offer`];

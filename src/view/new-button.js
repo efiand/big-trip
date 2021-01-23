@@ -1,4 +1,4 @@
-import AbstractView from '../view/abstract';
+import AbstractView from './abstract';
 
 export const createNewButtonTemplate = () => {
   return `

@@ -1,5 +1,5 @@
+import AbstractView from './abstract';
 import {Utils} from '../utils';
-import AbstractView from '../view/abstract';
 import {FilterType} from '../const';
 
 const createListMarkup = (currentFilter, isDisabled) => Object.values(FilterType).reduce((markup, filter) => {

@@ -1,8 +1,8 @@
 import SortView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
-import PointPresenter from '../presenter/point';
-import PointNewPresenter from '../presenter/point-new';
+import PointPresenter from './point';
+import PointNewPresenter from './point-new';
 import {Dates, Render} from '../utils';
 import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from '../const';
 

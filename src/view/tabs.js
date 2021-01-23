@@ -1,4 +1,4 @@
-import SmartView from '../view/smart';
+import SmartView from './smart';
 import {Utils} from '../utils';
 import {Tabs} from '../const';
 
