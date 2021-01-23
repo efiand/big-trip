@@ -22,7 +22,15 @@ export default class AbstractView {
     return this._element;
   }
 
+  hide() {
+    this.getElement().hidden = true;
+  }
+
   removeElement() {
     this._element = null;
+  }
+
+  show() {
+    this.getElement().hidden = false;
   }
 }

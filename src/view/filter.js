@@ -52,17 +52,17 @@ export default class FilterView extends AbstractView {
     return createFiltersTemplate(this._currentFilter, this._isDisabled);
   }
 
-  _changeFilterTypeHandler(evt) {
-    evt.preventDefault();
-
-    this._callback.changeFilterType(evt.target.value);
-  }
-
   setChangeFilterTypeHandler(callback) {
     this._callback.changeFilterType = callback;
 
     for (const radioBtn of this._radioBtns) {
       radioBtn.addEventListener(`change`, this._changeFilterTypeHandler);
     }
+  }
+
+  _changeFilterTypeHandler(evt) {
+    evt.preventDefault();
+
+    this._callback.changeFilterType(evt.target.value);
   }
 }

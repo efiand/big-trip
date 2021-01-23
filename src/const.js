@@ -2,6 +2,11 @@
 
 export const NUMERAL_SYSTEM_BASE = 10;
 
+export const Tabs = {
+  TABLE: `table`,
+  STATS: `stats`
+};
+
 export const FilterType = {
   DEFAULT: `everything`,
   FUTURE: `future`,
