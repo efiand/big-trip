@@ -4,7 +4,7 @@ import NoPointsView from '../view/no-points';
 import PointPresenter from '../presenter/point';
 import PointNewPresenter from '../presenter/point-new';
 import {Dates, Render} from '../utils';
-import {FilterType, SortType, UpdateType, UserAction} from '../const';
+import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from '../const';
 
 const sortPoints = {
   [SortType.DEFAULT](pointA, pointB) {
@@ -35,32 +35,45 @@ export default class TripPresenter {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
-
     this._sortComponent = null;
     this._newButtonComponent = null;
+    this._tabsComponent = null;
+    this._statsComponent = null;
     this._listComponent = new PointsListView();
     this._noPointsComponent = new NoPointsView();
-
     this._pointPresenters = {};
     this._currentSortType = SortType.DEFAULT;
+    this._isDestroyed = true;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleTabsClick = this._handleTabsClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
+
+    this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction);
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
-
-    this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction);
   }
 
-  init(newButtonComponent) {
+  init(newButtonComponent, tabsComponent, statsComponent) {
     this._newButtonComponent = newButtonComponent;
+    this._tabsComponent = tabsComponent;
+    this._statsComponent = statsComponent;
 
-    this._newButtonComponent.setClickHandler(() => this._createPoint());
+    this._newButtonComponent.setClickHandler(() => {
+      this._createPoint();
+      this._tabsComponent.setDefault();
+      if (this._isDestroyed) {
+        this._create();
+      }
+    });
 
-    this._renderTrip();
+    this._create();
+
+    this._tabsComponent.setClickHandler(this._handleTabsClick);
+    Render.render(this._tripContainer, this._statsComponent, RenderPosition.AFTEREND);
   }
 
   _clearSort() {
@@ -80,16 +93,35 @@ export default class TripPresenter {
   }
 
   _clearTrip() {
-    // тут будет еще что-то, по всей видимости
     this._clearSort();
     this._clearNoPoints();
     this._clearList();
   }
 
+  _create() {
+    if (!this._isDestroyed) {
+      return;
+    }
+
+    this._renderTrip();
+
+    this._statsComponent.hide();
+    this._tabsComponent.setDefault();
+    this._isDestroyed = false;
+  }
+
   _createPoint() {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.DEFAULT);
-    this._pointNewPresenter.init(this._newButtonComponent);
+    this._pointNewPresenter.init((pointNewComponent) => {
+      this._newButtonComponent.getElement().disabled = pointNewComponent !== null;
+      this._tabsComponent.setDefault();
+    });
+  }
+
+  _destroy() {
+    this._clearTrip();
+    this._isDestroyed = true;
   }
 
   _getPoints() {
@@ -117,8 +149,8 @@ export default class TripPresenter {
         this._renderPoints(this._getPoints().slice());
         break;
       case UpdateType.MAJOR:
-        this._clearTrip();
-        this._renderTrip();
+        this._destroy();
+        this._create();
         break;
     }
   }
@@ -131,6 +163,18 @@ export default class TripPresenter {
     this._currentSortType = sortType;
     this._clearList();
     this._renderPoints(this._getPoints().slice());
+  }
+
+  _handleTabsClick(activeTab) {
+    switch (activeTab) {
+      case Tabs.TABLE:
+        this._create();
+        break;
+      case Tabs.STATS:
+        this._destroy();
+        this._statsComponent.show();
+        break;
+    }
   }
 
   _handleViewAction(actionType, updateType, update) {

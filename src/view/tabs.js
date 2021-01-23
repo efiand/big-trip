@@ -1,10 +1,6 @@
+import SmartView from '../view/smart';
 import {Utils} from '../utils';
-import AbstractView from '../view/abstract';
-
-const Tabs = {
-  TABLE: `table`,
-  STATS: `stats`
-};
+import {Tabs} from '../const';
 
 const createTabsTemplate = (activeTab) => {
   const tabsList = Object.values(Tabs).reduce((markup, tab) => {
@@ -12,7 +8,7 @@ const createTabsTemplate = (activeTab) => {
 
     return `
       ${markup}
-      <a class="trip-tabs__btn ${activeClass}" href="#">
+      <a class="trip-tabs__btn ${activeClass}" href="#" data-tab="${tab}">
         ${Utils.capitalize(tab)}
       </a>
     `;
@@ -25,14 +21,43 @@ const createTabsTemplate = (activeTab) => {
   `;
 };
 
-export default class TabsView extends AbstractView {
+export default class TabsView extends SmartView {
   constructor(activeTab = Tabs.TABLE) {
     super();
 
-    this._activeTab = activeTab;
+    this._data.activeTab = activeTab;
+
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
-    return createTabsTemplate(this._activeTab);
+    return createTabsTemplate(this._data.activeTab);
+  }
+
+  restoreHandlers() {
+    this.setClickHandler(this._callback.click);
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    this.getElement().addEventListener(`click`, this._clickHandler);
+  }
+
+  setDefault() {
+    this.updateData({
+      activeTab: Tabs.TABLE
+    });
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+
+    if (evt.target.tagName === `A`) {
+      const activeTab = evt.target.dataset.tab;
+
+      this._callback.click(activeTab);
+      this.updateData({activeTab});
+    }
   }
 }

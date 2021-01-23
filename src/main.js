@@ -1,5 +1,6 @@
 import NewButtonView from './view/new-button';
 import TabsView from './view/tabs';
+import StatsView from './view/stats';
 import InfoPresenter from './presenter/info';
 import FilterPresenter from './presenter/filter';
 import TripPresenter from './presenter/trip';
@@ -24,6 +25,7 @@ const tripMainElement = document.querySelector(`.trip-events`);
 
 const newButtonComponent = new NewButtonView();
 const tabsComponent = new TabsView();
+const statsComponent = new StatsView();
 
 const infoPresenter = new InfoPresenter(tripHeaderElement, pointsModel);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, pointsModel);
@@ -34,4 +36,4 @@ Render.render(tripHeaderElement, newButtonComponent);
 
 infoPresenter.init();
 filterPresenter.init();
-tripPresenter.init(newButtonComponent);
+tripPresenter.init(newButtonComponent, tabsComponent, statsComponent);
