@@ -26,7 +26,17 @@ export default class InfoPresenter {
     Render.remove(prevInfoComponent);
   }
 
+  _destroy() {
+    Render.remove(this._infoComponent);
+    this._infoComponent = null;
+  }
+
   _handleModelEvent() {
+    if (!this._pointsModel.getPoints().length) {
+      this._destroy();
+      return;
+    }
+
     this.init();
   }
 }

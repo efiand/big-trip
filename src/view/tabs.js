@@ -1,11 +1,13 @@
 import {Utils} from '../utils';
 import AbstractView from '../view/abstract';
 
-const TABS = [`table`, `stats`];
-const defaultTab = TABS[0];
+const Tabs = {
+  TABLE: `table`,
+  STATS: `stats`
+};
 
 const createTabsTemplate = (activeTab) => {
-  const tabsList = TABS.reduce((markup, tab) => {
+  const tabsList = Object.values(Tabs).reduce((markup, tab) => {
     const activeClass = tab === activeTab ? `trip-tabs__btn--active` : ``;
 
     return `
@@ -24,7 +26,7 @@ const createTabsTemplate = (activeTab) => {
 };
 
 export default class TabsView extends AbstractView {
-  constructor(activeTab = defaultTab) {
+  constructor(activeTab = Tabs.TABLE) {
     super();
 
     this._activeTab = activeTab;
