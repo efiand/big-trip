@@ -14,77 +14,76 @@ const Name = {
 dayjs.extend(customParseFormat);
 
 export default class Dates {
-  static addMinutes(minutes, instance = dayjs()) {
-    return instance.add(minutes, Name.MINUTE);
+  static addMinutes(minutes, dateInst = dayjs()) {
+    return dateInst.add(minutes, Name.MINUTE);
   }
 
   static getDaysFromMs(ms) {
     return Math.ceil(ms / MS_IN_DAY);
   }
 
-  static getDiff(dateA, dateB = dayjs().format()) {
-    return dayjs(dateA).diff(dateB);
+  static getDiff(dateInstA, dateInstB = dayjs()) {
+    return dateInstA.diff(dateInstB);
   }
 
-  static getFormattedDuration(startDate, endDate) {
-    const startInstance = dayjs(startDate);
-    const endInstance = dayjs(endDate);
-    const minutes = endInstance.diff(startInstance, Name.MINUTE);
+  static getFormattedDuration(dateInstA, dateInstB) {
+    const minutes = dateInstB.diff(dateInstA, Name.MINUTE);
     const minuteStr = `${Utils.formatWithLead0(minutes % 60)}M`;
 
     if (minutes < 60) {
       return minuteStr;
     }
 
-    const hours = endInstance.diff(startInstance, Name.HOUR);
+    const hours = dateInstB.diff(dateInstA, Name.HOUR);
     const hourStr = `${Utils.formatWithLead0(hours % 24)}H`;
     if (hours < 24) {
       return `${hourStr} ${minuteStr}`;
     }
 
-    const days = endInstance.diff(startInstance, Name.DAY);
+    const days = dateInstB.diff(dateInstA, Name.DAY);
     return `${Utils.formatWithLead0(days)}D ${hourStr} ${minuteStr}`;
   }
 
-  static getFormattedRange(dateA, dateB) {
-    const startDate = dayjs(dateA);
-    const endDate = dayjs(dateB);
-    const isEqualMonths = startDate.month() === endDate.month();
+  static getFormattedRange(dateInstA, dateInstB) {
+    const isEqualMonths = dateInstA.month() === dateInstB.month();
     return {
-      start: startDate.format(SHORT_HUMAN_FORMAT),
-      end: endDate.format(isEqualMonths ? `DD` : SHORT_HUMAN_FORMAT)
+      start: dateInstA.format(SHORT_HUMAN_FORMAT),
+      end: dateInstB.format(isEqualMonths ? `DD` : SHORT_HUMAN_FORMAT)
     };
   }
 
-  static getHumanDate(date) {
-    return dayjs(date).format(SHORT_HUMAN_FORMAT);
+  static getHumanDate(dateInst) {
+    return dateInst.format(SHORT_HUMAN_FORMAT);
   }
 
-  static getISO(date) {
-    return dayjs(date).format();
+  static getInst(dateStr, isHuman = false) {
+    if (isHuman) {
+      return dayjs(dateStr, HUMAN_FORMAT);
+    }
+    return dayjs(dateStr);
   }
 
-  static getISODate(date) {
-    return dayjs(date).format(`YYYY-MM-DD`);
+  static getISO(dateInst) {
+    return dateInst.format();
   }
 
-  static getTime(date) {
-    return dayjs(date).format(`HH:mm`);
+  static getISODate(dateInst) {
+    return dateInst.format(`YYYY-MM-DD`);
   }
 
-  static getTimestampDuration(dateA, dateB) {
-    return dayjs(dateA).unix() - dayjs(dateB).unix();
+  static getTime(dateInst) {
+    return dateInst.format(`HH:mm`);
   }
 
-  static isEqual(dateA, dateB) {
-    return (!dateA && !dateB) || dayjs(dateA).isSame(dateB, `D`);
+  static getTimestampDuration(dateInstA, dateInstB) {
+    return dateInstA.unix() - dateInstB.unix();
   }
 
-  static humanize(date) {
-    return dayjs(date).format(HUMAN_FORMAT);
+  static humanize(dateInst) {
+    return dateInst.format(HUMAN_FORMAT);
   }
 
-  static unhumanize(formattedDate) {
-    return dayjs(formattedDate, HUMAN_FORMAT).toISOString();
+  static isEqual(dateInstA, dateInstB) {
+    return (!dateInstA && !dateInstB) || dayjs(dateInstA).isSame(dayjs(dateInstB));
   }
 }

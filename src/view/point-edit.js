@@ -16,7 +16,7 @@ const DATEPICKER_DEFAULTS = {
 const getDefaultData = () => {
   const [{type, offers}] = pointTypes;
   const [destination] = destinations;
-  const dateFrom = Dates.getISO(new Date());
+  const dateFrom = Dates.getInst();
 
   return {
     type,
@@ -453,8 +453,8 @@ export default class PointEditView extends SmartView {
     delete data.isNewPoint;
 
     return Object.assign({}, data, {
-      dateFrom: Dates.unhumanize(data.dateFrom),
-      dateTo: Dates.unhumanize(data.dateTo)
+      dateFrom: Dates.getInst(data.dateFrom, true),
+      dateTo: Dates.getInst(data.dateTo, true)
     });
   }
 
