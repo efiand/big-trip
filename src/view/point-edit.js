@@ -16,13 +16,13 @@ const DATEPICKER_DEFAULTS = {
 const getDefaultData = () => {
   const [pointType] = pointTypes;
   const [destination] = destinations;
-  const startTime = Dates.getISO(new Date());
+  const dateFrom = Dates.getISO(new Date());
 
   return {
     pointType,
     destination,
-    startTime,
-    endTime: startTime,
+    dateFrom,
+    dateTo: dateFrom,
     basePrice: ``
   };
 };
@@ -83,13 +83,13 @@ const createPointEditTemplate = ({
   isNewPoint,
   pointType,
   destination,
-  startTime,
-  endTime,
+  dateFrom,
+  dateTo,
   basePrice
 }) => {
   const {offers, type: typeName} = pointType;
   const {name: city, description, pictures} = destination;
-  const isSubmitDisabled = !city || !startTime || !endTime || !basePrice;
+  const isSubmitDisabled = !city || !dateFrom || !dateTo || !basePrice;
 
   return `
     <li class="trip-events__item">
@@ -142,7 +142,7 @@ const createPointEditTemplate = ({
               id="event-start-time-${id}"
               type="text"
               name="event-start-time"
-              value="${startTime}"
+              value="${dateFrom}"
             />
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
@@ -151,7 +151,7 @@ const createPointEditTemplate = ({
               id="event-end-time-${id}"
               type="text"
               name="event-end-time"
-              value="${endTime}"
+              value="${dateTo}"
             />
           </div>
 
@@ -207,14 +207,14 @@ export default class PointEditView extends SmartView {
     super();
 
     this._data = PointEditView.parsePointToData(point);
-    this._datepickerStart = null;
-    this._datepickerEnd = null;
+    this._datepickerFrom = null;
+    this._datepickerTo = null;
 
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
-    this._changeEndDateHandler = this._changeEndDateHandler.bind(this);
+    this._changeDateToHandler = this._changeDateToHandler.bind(this);
     this._changeOfferHandler = this._changeOfferHandler.bind(this);
     this._changePointTypeHandler = this._changePointTypeHandler.bind(this);
-    this._changeStartDateHandler = this._changeStartDateHandler.bind(this);
+    this._changeDateFromHandler = this._changeDateFromHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteHandler = this._deleteHandler.bind(this);
     this._inputDestinationHandler = this._inputDestinationHandler.bind(this);
@@ -228,11 +228,11 @@ export default class PointEditView extends SmartView {
     return this._form.querySelector(`.event__rollup-btn`);
   }
 
-  get _dateEndField() {
+  get _dateToField() {
     return this._form.querySelector(`[name="event-end-time"]`);
   }
 
-  get _dateStartField() {
+  get _dateFromField() {
     return this._form.querySelector(`[name="event-start-time"]`);
   }
 
@@ -268,14 +268,14 @@ export default class PointEditView extends SmartView {
     // переопределяем метод родительского класса, чтобы удалялись ненужные календари
     super.removeElement();
 
-    if (this._datepickerStart) {
-      this._datepickerStart.destroy();
-      this._datepickerStart = null;
+    if (this._datepickerFrom) {
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
     }
 
-    if (this._datepickerEnd) {
-      this._datepickerEnd.destroy();
-      this._datepickerEnd = null;
+    if (this._datepickerTo) {
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
     }
   }
 
@@ -319,9 +319,9 @@ export default class PointEditView extends SmartView {
     });
   }
 
-  _changeEndDateHandler([userDate]) {
+  _changeDateToHandler([userDate]) {
     this.updateData({
-      endTime: Dates.humanize(userDate)
+      dateTo: Dates.humanize(userDate)
     }, null);
   }
 
@@ -348,9 +348,9 @@ export default class PointEditView extends SmartView {
     });
   }
 
-  _changeStartDateHandler([userDate]) {
+  _changeDateFromHandler([userDate]) {
     this.updateData({
-      startTime: Dates.humanize(userDate)
+      dateFrom: Dates.humanize(userDate)
     }, null);
   }
 
@@ -387,16 +387,16 @@ export default class PointEditView extends SmartView {
     });
   }
 
-  _setEndDatepicker() {
-    if (this._datepickerEnd) {
+  _setDatepickerTo() {
+    if (this._datepickerTo) {
       // при обновлении удаляем вспомогательные элементы, создаваемые при инициализации
-      this._datepickerEnd.destroy();
-      this._datepickerEnd = null;
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
     }
 
-    this._datepickerEnd = flatpickr(this._dateEndField, Object.assign({}, DATEPICKER_DEFAULTS, {
-      defaultDate: this._data.endTime,
-      onChange: this._changeEndDateHandler
+    this._datepickerTo = flatpickr(this._dateToField, Object.assign({}, DATEPICKER_DEFAULTS, {
+      defaultDate: this._data.dateTo,
+      onChange: this._changeDateToHandler
     }));
   }
 
@@ -413,20 +413,20 @@ export default class PointEditView extends SmartView {
     this._destinationField.addEventListener(`change`, this._changeDestinationHandler);
     this._priceField.addEventListener(`input`, this._inputPriceHandler);
 
-    this._setStartDatepicker();
-    this._setEndDatepicker();
+    this._setDatepickerFrom();
+    this._setDatepickerTo();
   }
 
-  _setStartDatepicker() {
-    if (this._datepickerStart) {
+  _setDatepickerFrom() {
+    if (this._datepickerFrom) {
       // при обновлении удаляем вспомогательные элементы, создаваемые при инициализации
-      this._datepickerStart.destroy();
-      this._datepickerStart = null;
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
     }
 
-    this._datepickerStart = flatpickr(this._dateStartField, Object.assign({}, DATEPICKER_DEFAULTS, {
-      defaultDate: this._data.startTime,
-      onChange: this._changeStartDateHandler
+    this._datepickerFrom = flatpickr(this._dateFromField, Object.assign({}, DATEPICKER_DEFAULTS, {
+      defaultDate: this._data.dateFrom,
+      onChange: this._changeDateFromHandler
     }));
   }
 
@@ -455,15 +455,15 @@ export default class PointEditView extends SmartView {
     delete data.isNewPoint;
 
     return Object.assign({}, data, {
-      startTime: Dates.unhumanize(data.startTime),
-      endTime: Dates.unhumanize(data.endTime)
+      dateFrom: Dates.unhumanize(data.dateFrom),
+      dateTo: Dates.unhumanize(data.dateTo)
     });
   }
 
   static parsePointToData(point) {
     return Object.assign({}, point, {
-      startTime: Dates.humanize(point.startTime),
-      endTime: Dates.humanize(point.endTime),
+      dateFrom: Dates.humanize(point.dateFrom),
+      dateTo: Dates.humanize(point.dateTo),
       isNewPoint: !point.id
     });
   }

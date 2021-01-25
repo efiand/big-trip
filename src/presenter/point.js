@@ -94,9 +94,9 @@ export default class PointPresenter {
 
   _handleFormSubmit(update) {
     // Проверяем, изменились ли данные, которые попадают под фильтрацию
-    const isStartTimeUpdated = !Dates.isEqual(this._point.startTime, update.startTime);
-    const isEndTimeUpdated = !Dates.isEqual(this._point.startTime, update.endTime);
-    const updateType = isStartTimeUpdated || isEndTimeUpdated ? UpdateType.MINOR : UpdateType.PATCH;
+    const isUpdatedDateFrom = !Dates.isEqual(this._point.dateFrom, update.dateFrom);
+    const isUpdatedDateTo = !Dates.isEqual(this._point.dateFrom, update.dateTo);
+    const updateType = isUpdatedDateFrom || isUpdatedDateTo ? UpdateType.MINOR : UpdateType.PATCH;
 
     this._changeData(UserAction.UPDATE_POINT, updateType, update);
     this._switchToView();

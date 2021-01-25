@@ -168,7 +168,7 @@ export default class StatsView extends SmartView {
       data: labels.map((label) => {
         const filteredPoints = points.filter(({pointType}) => pointType.type === label);
         const commonDuration = filteredPoints.reduce((value, point) => {
-          return value + Dates.getDiff(point.endTime, point.startTime);
+          return value + Dates.getDiff(point.dateTo, point.dateFrom);
         }, 0);
         return Dates.getDaysFromMs(commonDuration);
       })

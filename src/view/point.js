@@ -27,8 +27,8 @@ const createOffersList = (offers) => {
 export const createPointTemplate = ({
   pointType,
   destination,
-  startTime,
-  endTime,
+  dateFrom,
+  dateTo,
   basePrice,
   isFavorite
 }) => {
@@ -37,8 +37,8 @@ export const createPointTemplate = ({
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${Dates.getISODate(startTime)}">
-          ${Dates.getHumanDate(startTime)}
+        <time class="event__date" datetime="${Dates.getISODate(dateFrom)}">
+          ${Dates.getHumanDate(dateFrom)}
         </time>
         <div class="event__type">
           <img
@@ -52,15 +52,15 @@ export const createPointTemplate = ({
         <h3 class="event__title">${Utils.capitalize(pointType.type)} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${Dates.getISO(startTime)}">
-              ${Dates.getTime(startTime)}
+            <time class="event__start-time" datetime="${Dates.getISO(dateFrom)}">
+              ${Dates.getTime(dateFrom)}
             </time>
             &mdash;
-            <time class="event__end-time" datetime="${Dates.getISO(endTime)}">
-              ${Dates.getTime(endTime)}
+            <time class="event__end-time" datetime="${Dates.getISO(dateTo)}">
+              ${Dates.getTime(dateTo)}
             </time>
           </p>
-          <p class="event__duration">${Dates.getFormattedDuration(startTime, endTime)}</p>
+          <p class="event__duration">${Dates.getFormattedDuration(dateFrom, dateTo)}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>

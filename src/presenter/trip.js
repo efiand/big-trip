@@ -8,11 +8,11 @@ import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from
 
 const sortPoints = {
   [SortType.DEFAULT](pointA, pointB) {
-    return Dates.getDiff(pointA.startTime, pointB.startTime);
+    return Dates.getDiff(pointA.dateFrom, pointB.dateFrom);
   },
   [SortType.DURATION](pointA, pointB) {
-    const durationA = Dates.getTimestampDuration(pointA.endTime, pointA.startTime);
-    const durationB = Dates.getTimestampDuration(pointB.endTime, pointB.startTime);
+    const durationA = Dates.getTimestampDuration(pointA.dateTo, pointA.dateFrom);
+    const durationB = Dates.getTimestampDuration(pointB.dateTo, pointB.dateFrom);
 
     return durationA - durationB;
   },
@@ -23,10 +23,10 @@ const sortPoints = {
 
 const filterPoints = {
   [FilterType.FUTURE](point) {
-    return Dates.getDiff(point.startTime) >= 0;
+    return Dates.getDiff(point.dateFrom) >= 0;
   },
   [FilterType.PAST](point) {
-    return Dates.getDiff(point.endTime) < 0;
+    return Dates.getDiff(point.dateTo) < 0;
   }
 };
 

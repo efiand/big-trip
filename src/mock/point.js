@@ -10,7 +10,7 @@ let tempTime = Dates.addMinutes(Random.getInt(-DURATION_MAX, DURATION_MAX));
 export const generatePoint = () => {
   // Начало следующего мероприятия совпадает с окончанием ранее сгенерированного
   // Поэтому сохраняем значение из счетчика времени
-  const startTime = tempTime.toISOString();
+  const dateFrom = tempTime.toISOString();
 
   // Добавляем к счетчику времени случайную продолжительность
   tempTime = Dates.addMinutes(Random.getInt(DURATION_MIN, DURATION_MAX), tempTime);
@@ -26,8 +26,8 @@ export const generatePoint = () => {
     id: Random.generateId(),
     pointType,
     destination: destinations.find(({name}) => name === cityName),
-    startTime,
-    endTime: tempTime.toISOString(),
+    dateFrom,
+    dateTo: tempTime.toISOString(),
     isFavorite: Boolean(Random.getInt()),
     basePrice: Random.getInt(...PRICE_RANGE)
   };

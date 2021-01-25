@@ -6,7 +6,7 @@ const createInfoTemplate = (points) => {
     return pointData.destination.name;
   })));
   const displayedCities = cities.length > 3 ? [cities[0], `...`, cities[cities.length - 1]] : cities;
-  const datesRange = Dates.getFormattedRange(points[0].startTime, points[points.length - 1].endTime);
+  const datesRange = Dates.getFormattedRange(points[0].dateFrom, points[points.length - 1].dateTo);
   const cost = points.reduce((total, {basePrice, pointType: {offers}}) => {
     return total + parseInt(basePrice, 10) + offers.reduce((offersTotal, offer) => {
       return offersTotal + (offer.isChecked ? offer.price : 0);
