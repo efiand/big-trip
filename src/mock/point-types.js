@@ -20,7 +20,6 @@ export const pointTypes = POINT_TYPES.map((typeName) => {
     type: typeName,
     offers: offerNames.map((title) => ({
       title,
-      alias: title.slice(title.lastIndexOf(` `)).toLowerCase().trim(),
       price: Random.getInt(...PRICE_RANGE),
       isChecked: false
     }))

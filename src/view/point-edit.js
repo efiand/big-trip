@@ -28,20 +28,20 @@ const getDefaultData = () => {
   };
 };
 
-const createPointTypes = (typeName) => pointTypes.reduce((template, {type}, i) => {
+const createPointTypes = (typeName) => pointTypes.reduce((template, {type}) => {
   const checkedAttr = type === typeName ? `checked` : ``;
   return `
     ${template}
     <div class="event__type-item">
       <input
-        id="event-type-${type}-${i + 1}"
+        id="event-type-${type}"
         class="event__type-input visually-hidden"
         type="radio"
         name="event-type"
         value="${type}"
         ${checkedAttr}
       />
-      <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${i + 1}">
+      <label class="event__type-label event__type-label--${type}" for="event-type-${type}">
         ${Utils.capitalize(type)}
       </label>
     </div>
@@ -53,7 +53,7 @@ const createCitiesList = () => CITY_NAMES.reduce((template, cityName) => {
 }, ``);
 
 const createOffersList = (offers) => offers.reduce((template, offer, i) => {
-  const {title, alias, price: offerPrice, isChecked} = offer;
+  const {title, price: offerPrice, isChecked} = offer;
   const checkedAttr = isChecked ? `checked` : ``;
 
   return `
@@ -61,12 +61,13 @@ const createOffersList = (offers) => offers.reduce((template, offer, i) => {
     <div class="event__offer-selector">
       <input
         class="event__offer-checkbox visually-hidden"
-        id="event-offer-${alias}-${i + 1}"
+        id="event-offer-${i}"
         type="checkbox"
-        name="event-offer-${alias}"
+        name="event-offer-${i}"
+        data-offer-id="${i}"
         ${checkedAttr}
       />
-      <label class="event__offer-label" for="event-offer-${alias}-${i + 1}">
+      <label class="event__offer-label" for="event-offer-${i}">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offerPrice}</span>
@@ -328,10 +329,9 @@ export default class PointEditView extends SmartView {
 
   _changeOfferHandler(evt) {
     evt.preventDefault();
-    const alias = evt.target.name.replace(`event-offer-`, ``);
+    const {offerId} = evt.target.dataset;
     const offers = this._data.offers.slice();
-    const currentIndex = offers.findIndex((item) => item.alias === alias);
-    offers[currentIndex].isChecked = evt.target.checked;
+    offers[offerId].isChecked = evt.target.checked;
 
     this.updateData({offers}, null);
   }
