@@ -14,16 +14,17 @@ const DATEPICKER_DEFAULTS = {
 };
 
 const getDefaultData = () => {
-  const [pointType] = pointTypes;
+  const [{type, offers}] = pointTypes;
   const [destination] = destinations;
   const dateFrom = Dates.getISO(new Date());
 
   return {
-    pointType,
+    type,
     destination,
     dateFrom,
     dateTo: dateFrom,
-    basePrice: ``
+    basePrice: ``,
+    offers
   };
 };
 
@@ -79,15 +80,15 @@ const createPhotosList = (pictures) => pictures.reduce((template, {src, descript
 }, ``);
 
 const createPointEditTemplate = ({
-  id = 0,
+  id = `new`,
   isNewPoint,
-  pointType,
+  type,
   destination,
   dateFrom,
   dateTo,
-  basePrice
+  basePrice,
+  offers
 }) => {
-  const {offers, type: typeName} = pointType;
   const {name: city, description, pictures} = destination;
   const isSubmitDisabled = !city || !dateFrom || !dateTo || !basePrice;
 
@@ -102,7 +103,7 @@ const createPointEditTemplate = ({
                 class="event__type-icon"
                 width="17"
                 height="17"
-                src="img/icons/${typeName}.png"
+                src="img/icons/${type}.png"
                 alt="Event type icon"
               />
             </label>
@@ -115,14 +116,14 @@ const createPointEditTemplate = ({
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointTypes(pointType)}
+                ${createPointTypes(type)}
               </fieldset>
             </div>
           </div>
 
           <div class="event__field-group event__field-group--destination">
             <label class="event__label event__type-output" for="event-destination-${id}">
-              ${Utils.capitalize(typeName)}
+              ${Utils.capitalize(type)}
             </label>
             <input
               class="event__input event__input--destination"
@@ -328,23 +329,20 @@ export default class PointEditView extends SmartView {
   _changeOfferHandler(evt) {
     evt.preventDefault();
     const alias = evt.target.name.replace(`event-offer-`, ``);
-    const {pointType} = this._data;
-    const offers = pointType.offers.slice();
+    const offers = this._data.offers.slice();
     const currentIndex = offers.findIndex((item) => item.alias === alias);
     offers[currentIndex].isChecked = evt.target.checked;
 
-    this.updateData({
-      pointType: Object.assign({}, pointType, {
-        offers
-      })
-    }, null);
+    this.updateData({offers}, null);
   }
 
   _changePointTypeHandler(evt) {
     evt.preventDefault();
 
+    const {type: typeName, offers} = pointTypes.find(({type}) => type === evt.target.value);
     this.updateData({
-      pointType: pointTypes.find(({type}) => type === evt.target.value)
+      type: typeName,
+      offers: offers.slice()
     });
   }
 

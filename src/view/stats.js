@@ -138,7 +138,7 @@ export default class StatsView extends SmartView {
   _setCharts() {
     const {points} = this._data;
 
-    const labels = [...new Set(points.map(({pointType}) => pointType.type))];
+    const labels = [...new Set(points.map(({type}) => type))];
 
     this._moneyChart = renderChart({
       ctx: this.getElement().querySelector(`.statistics__chart--money`),
@@ -146,7 +146,7 @@ export default class StatsView extends SmartView {
       text: ChartName.MONEY,
       formatter: (val) => `€ ${val}`,
       data: labels.map((label) => {
-        return points.filter(({pointType}) => pointType.type === label).reduce((count, point) => {
+        return points.filter(({type}) => type === label).reduce((count, point) => {
           return count + parseInt(point.basePrice, 10);
         }, 0);
       })
@@ -157,7 +157,7 @@ export default class StatsView extends SmartView {
       text: ChartName.TYPE,
       formatter: (val) => `${val}x`,
       data: labels.map((label) => {
-        return points.filter(({pointType}) => pointType.type === label).length;
+        return points.filter(({type}) => type === label).length;
       })
     });
     this._timeChart = renderChart({
@@ -166,7 +166,7 @@ export default class StatsView extends SmartView {
       text: ChartName.TIME,
       formatter: (val) => `${val}D`,
       data: labels.map((label) => {
-        const filteredPoints = points.filter(({pointType}) => pointType.type === label);
+        const filteredPoints = points.filter(({type}) => type === label);
         const commonDuration = filteredPoints.reduce((value, point) => {
           return value + Dates.getDiff(point.dateTo, point.dateFrom);
         }, 0);

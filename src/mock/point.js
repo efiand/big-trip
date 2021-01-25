@@ -17,18 +17,19 @@ export const generatePoint = () => {
 
   const typeName = Random.getItem(POINT_TYPES);
   const cityName = Random.getItem(CITY_NAMES);
-  const pointType = JSON.parse(JSON.stringify(pointTypes.find(({type}) => type === typeName)));
-  pointType.offers.forEach((offer) => {
+  const {offers} = JSON.parse(JSON.stringify(pointTypes.find(({type}) => type === typeName)));
+  offers.forEach((offer) => {
     offer.isChecked = Boolean(Random.getInt());
   });
 
   return {
     id: Random.generateId(),
-    pointType,
+    type: typeName,
     destination: destinations.find(({name}) => name === cityName),
     dateFrom,
     dateTo: tempTime.toISOString(),
     isFavorite: Boolean(Random.getInt()),
-    basePrice: Random.getInt(...PRICE_RANGE)
+    basePrice: Random.getInt(...PRICE_RANGE),
+    offers
   };
 };
