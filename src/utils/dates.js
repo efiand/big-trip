@@ -79,8 +79,8 @@ export default class Dates {
     return dateInstA.unix() - dateInstB.unix();
   }
 
-  static humanize(dateInst) {
-    return dateInst.format(HUMAN_FORMAT);
+  static humanize(date) {
+    return dayjs(date).format(HUMAN_FORMAT);
   }
 
   static isEqual(dateInstA, dateInstB) {
