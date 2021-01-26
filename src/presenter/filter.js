@@ -18,7 +18,7 @@ export default class FilterPresenter {
     this._pointsModel.addObserver(this._handleModelEvent);
   }
 
-  init(isDisabled = false) {
+  init(isDisabled = true) {
     this._currentFilter = isDisabled ? FilterType.DEFAULT : this._filterModel.getFilter();
 
     const prevFilterComponent = this._filterComponent;

@@ -62,10 +62,12 @@ export default class PointsModel extends Observer {
     return this._points;
   }
 
-  setData({points, pointTypes, destinations}) {
+  setData(updateType, {points = [], pointTypes = [], destinations = []}) {
     this._points = points.slice();
     this._pointTypes = Utils.cloneDeep(pointTypes);
     this._destinations = Utils.cloneDeep(destinations);
+
+    this._notify(updateType);
   }
 
   updatePoint(updateType, update) {

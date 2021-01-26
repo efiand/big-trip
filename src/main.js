@@ -8,7 +8,7 @@ import FilterModel from './model/filter';
 import PointsModel from './model/points';
 import Api from './api';
 import {Render} from './utils';
-import {RenderPosition} from './const';
+import {RenderPosition, UpdateType} from './const';
 
 const AUTHORIZATION = `Basic 68cefd64e8df947e825f4b4fa6cfe83d16ddb137`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
@@ -31,10 +31,14 @@ const tripPresenter = new TripPresenter(tripMainElement, pointsModel, filterMode
 Render.render(tripHeadingElement, tabsComponent, RenderPosition.AFTEREND);
 Render.render(tripHeaderElement, newButtonComponent);
 
-api.getData().then((data) => {
-  pointsModel.setData(data);
+infoPresenter.init();
+filterPresenter.init();
+tripPresenter.init(newButtonComponent, tabsComponent, statsComponent);
 
-  infoPresenter.init();
-  filterPresenter.init();
-  tripPresenter.init(newButtonComponent, tabsComponent, statsComponent);
-});
+api.getData()
+  .then((data) => {
+    pointsModel.setData(UpdateType.INIT, data);
+  })
+  .catch(() => {
+    pointsModel.setData(UpdateType.INIT, {});
+  });

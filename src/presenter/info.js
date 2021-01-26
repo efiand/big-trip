@@ -9,21 +9,10 @@ export default class InfoPresenter {
     this._infoComponent = null;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
-
-    this._pointsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
-    const prevInfoComponent = this._infoComponent;
-    this._infoComponent = new InfoView(this._pointsModel.getPoints());
-
-    if (prevInfoComponent === null) {
-      Render.render(this._infoContainer, this._infoComponent, RenderPosition.AFTERBEGIN);
-      return;
-    }
-
-    Render.replace(this._infoComponent, prevInfoComponent);
-    Render.remove(prevInfoComponent);
+    this._pointsModel.addObserver(this._handleModelEvent);
   }
 
   _destroy() {
@@ -37,6 +26,15 @@ export default class InfoPresenter {
       return;
     }
 
-    this.init();
+    const prevInfoComponent = this._infoComponent;
+    this._infoComponent = new InfoView(this._pointsModel.getPoints());
+
+    if (prevInfoComponent === null) {
+      Render.render(this._infoContainer, this._infoComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    Render.replace(this._infoComponent, prevInfoComponent);
+    Render.remove(prevInfoComponent);
   }
 }

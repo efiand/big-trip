@@ -1,6 +1,7 @@
 import SortView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
+import LoadingView from '../view/loading';
 import PointPresenter from './point';
 import PointNewPresenter from './point-new';
 import {Dates, Render} from '../utils';
@@ -41,16 +42,17 @@ export default class TripPresenter {
     this._statsComponent = null;
     this._listComponent = new PointsListView();
     this._noPointsComponent = new NoPointsView();
+    this._loadingConponent = new LoadingView();
     this._pointPresenters = {};
     this._currentSortType = SortType.DEFAULT;
     this._isDestroyed = true;
+    this._isLoading = true;
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleTabsClick = this._handleTabsClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
-
     this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction, this._pointsModel);
 
     this._pointsModel.addObserver(this._handleModelEvent);
@@ -100,9 +102,17 @@ export default class TripPresenter {
     this._clearSort();
     this._clearNoPoints();
     this._clearList();
+    Render.remove(this._loadingConponent);
   }
 
   _create() {
+    this._newButtonComponent.getElement().disabled = this._isLoading;
+
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (!this._isDestroyed) {
       return;
     }
@@ -156,6 +166,11 @@ export default class TripPresenter {
         this._destroy();
         this._create();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        Render.remove(this._loadingConponent);
+        this._create();
+        break;
     }
 
     if (notice && notice.points) {
@@ -199,6 +214,15 @@ export default class TripPresenter {
     }
   }
 
+  _renderList() {
+    Render.render(this._tripContainer, this._listComponent);
+    this._renderPoints(this._getPoints().slice());
+  }
+
+  _renderLoading() {
+    Render.render(this._tripContainer, this._loadingConponent);
+  }
+
   _renderNoPoints() {
     Render.render(this._tripContainer, this._noPointsComponent);
   }
@@ -211,11 +235,6 @@ export default class TripPresenter {
 
   _renderPoints(points) {
     points.forEach((point) => this._renderPoint(point));
-  }
-
-  _renderList() {
-    Render.render(this._tripContainer, this._listComponent);
-    this._renderPoints(this._getPoints().slice());
   }
 
   _renderSort() {
