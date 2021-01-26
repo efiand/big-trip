@@ -114,11 +114,11 @@ export default class PointsModel extends Observer {
 
   static adaptToServer(point) {
     const adaptedPoint = Object.assign({}, point, {
-      base_price: point.basePrice,
-      date_from: Dates.getUTC(point.dateFrom),
-      date_to: Dates.getUTC(point.dateTo),
-      is_favorite: point.isFavorite,
-      offers: Utils.cloneDeep(point.offers)
+      'base_price': point.basePrice,
+      'date_from': Dates.getUTC(point.dateFrom),
+      'date_to': Dates.getUTC(point.dateTo),
+      'is_favorite': point.isFavorite,
+      'offers': Utils.cloneDeep(point.offers)
     });
 
     delete adaptedPoint.basePrice;
