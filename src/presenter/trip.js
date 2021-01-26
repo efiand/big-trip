@@ -51,7 +51,7 @@ export default class TripPresenter {
     this._handleTabsClick = this._handleTabsClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
-    this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._listComponent, this._handleViewAction, this._pointsModel);
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -204,7 +204,7 @@ export default class TripPresenter {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._listComponent, this._handleViewAction, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._listComponent, this._handleViewAction, this._handleModeChange, this._pointsModel);
     pointPresenter.init(point);
     this._pointPresenters[point.id] = pointPresenter;
   }

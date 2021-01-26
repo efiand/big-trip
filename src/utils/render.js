@@ -24,14 +24,6 @@ export default class Render {
     container.insertAdjacentElement(place, child);
   }
 
-  static renderTemplate(container, template, place = RenderPosition.BEFOREEND) {
-    if (typeof container === `string`) {
-      container = this.createElement(container);
-    }
-
-    container.insertAdjacentHTML(place, template);
-  }
-
   static replace(newChild, oldChild) {
     if (oldChild instanceof AbstractView) {
       oldChild = oldChild.getElement();

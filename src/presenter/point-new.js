@@ -3,9 +3,10 @@ import {Render, Random} from '../utils';
 import {RenderPosition, UserAction, UpdateType} from '../const';
 
 export default class PointNewPresenter {
-  constructor(listContainer, changeData) {
+  constructor(listContainer, changeData, pointsModel) {
     this._listContainer = listContainer;
     this._changeData = changeData;
+    this._pointsModel = pointsModel;
     this._pointEditComponent = null;
     this._destroyCallback = null;
 
@@ -19,7 +20,8 @@ export default class PointNewPresenter {
       return;
     }
 
-    this._pointEditComponent = new PointEditView();
+    const {getDefaultPoint, pointTypes, destinations} = this._pointsModel;
+    this._pointEditComponent = new PointEditView(getDefaultPoint(), pointTypes, destinations);
     this._destroyCallback = callback;
 
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);

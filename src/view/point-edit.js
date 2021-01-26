@@ -1,9 +1,6 @@
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart';
-import {pointTypes} from '../mock/point-types';
-import {destinations} from '../mock/destinations';
-import {CITY_NAMES} from '../mock/const';
 import {Dates, Utils} from '../utils';
 
 const KEY_24_HR = `time_24hr`;
@@ -13,22 +10,7 @@ const DATEPICKER_DEFAULTS = {
   [KEY_24_HR]: true
 };
 
-const getDefaultData = () => {
-  const [{type, offers}] = pointTypes;
-  const [destination] = destinations;
-  const dateFrom = Dates.getInst();
-
-  return {
-    type,
-    destination,
-    dateFrom,
-    dateTo: dateFrom,
-    basePrice: ``,
-    offers
-  };
-};
-
-const createPointTypes = (typeName) => pointTypes.reduce((template, {type}) => {
+const createPointTypes = (typeName, pointTypes) => pointTypes.reduce((template, {type}) => {
   const checkedAttr = type === typeName ? `checked` : ``;
   return `
     ${template}
@@ -48,8 +30,8 @@ const createPointTypes = (typeName) => pointTypes.reduce((template, {type}) => {
   `;
 }, ``);
 
-const createCitiesList = () => CITY_NAMES.reduce((template, cityName) => {
-  return `${template}<option value="${cityName}"></option>`;
+const createCitiesList = (destinations) => destinations.reduce((template, {name}) => {
+  return `${template}<option value="${name}"></option>`;
 }, ``);
 
 const createOffersList = (offers) => offers.reduce((template, offer, i) => {
@@ -81,7 +63,7 @@ const createPhotosList = (pictures) => pictures.reduce((template, {src, descript
 }, ``);
 
 const createPointEditTemplate = ({
-  id = `new`,
+  id,
   isNewPoint,
   type,
   destination,
@@ -89,7 +71,7 @@ const createPointEditTemplate = ({
   dateTo,
   basePrice,
   offers
-}) => {
+}, pointTypes, destinations) => {
   const {name: city, description, pictures} = destination;
   const isSubmitDisabled = !city || !dateFrom || !dateTo || !basePrice;
 
@@ -117,7 +99,7 @@ const createPointEditTemplate = ({
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointTypes(type)}
+                ${createPointTypes(type, pointTypes)}
               </fieldset>
             </div>
           </div>
@@ -134,7 +116,7 @@ const createPointEditTemplate = ({
               value="${city}"
               list="destination-list-${id}"
             />
-            <datalist id="destination-list-${id}">${createCitiesList()}</datalist>
+            <datalist id="destination-list-${id}">${createCitiesList(destinations)}</datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
@@ -205,12 +187,14 @@ const createPointEditTemplate = ({
 };
 
 export default class PointEditView extends SmartView {
-  constructor(point = getDefaultData()) {
+  constructor(point, pointTypes, destinations) {
     super();
 
     this._data = PointEditView.parsePointToData(point);
     this._datepickerFrom = null;
     this._datepickerTo = null;
+    this._pointTypes = Utils.cloneDeep(pointTypes);
+    this._destinations = Utils.cloneDeep(destinations);
 
     this._changeDestinationHandler = this._changeDestinationHandler.bind(this);
     this._changeDateToHandler = this._changeDateToHandler.bind(this);
@@ -263,7 +247,7 @@ export default class PointEditView extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._data);
+    return createPointEditTemplate(this._data, this._pointTypes, this._destinations);
   }
 
   removeElement() {
@@ -310,7 +294,7 @@ export default class PointEditView extends SmartView {
   _changeDestinationHandler(evt) {
     evt.preventDefault();
 
-    const destination = PointEditView.getDestination(evt.target.value);
+    const destination = PointEditView.getDestination(evt.target.value, this._destinations);
 
     if (!destination.name) {
       evt.target.value = ``;
@@ -339,7 +323,7 @@ export default class PointEditView extends SmartView {
   _changePointTypeHandler(evt) {
     evt.preventDefault();
 
-    const {type: typeName, offers} = pointTypes.find(({type}) => type === evt.target.value);
+    const {type: typeName, offers} = this._pointTypes.find(({type}) => type === evt.target.value);
     this.updateData({
       type: typeName,
       offers: offers.slice()
@@ -365,7 +349,7 @@ export default class PointEditView extends SmartView {
   _inputDestinationHandler(evt) {
     evt.preventDefault();
 
-    const destination = PointEditView.getDestination(evt.target.value);
+    const destination = PointEditView.getDestination(evt.target.value, this._destinations);
     this.updateData({
       destination
     }, destination.description ? this.updateELement : null);
@@ -438,15 +422,12 @@ export default class PointEditView extends SmartView {
     this._callback.submit(PointEditView.parseDataToPoint(this._data));
   }
 
-  static getDestination(city) {
-    city = city.trim();
-    const destination = destinations.find(({name}) => name === city) || {
+  static getDestination(city, destinations) {
+    return destinations.find(({name}) => name === city) || {
       name: ``,
       description: null,
       pictures: null
     };
-
-    return destination;
   }
 
   static parseDataToPoint(data) {
@@ -461,8 +442,7 @@ export default class PointEditView extends SmartView {
   static parsePointToData(point) {
     return Object.assign({}, point, {
       dateFrom: Dates.humanize(point.dateFrom),
-      dateTo: Dates.humanize(point.dateTo),
-      isNewPoint: !point.id
+      dateTo: Dates.humanize(point.dateTo)
     });
   }
 }
