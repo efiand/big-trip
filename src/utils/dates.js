@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
 import {Utils} from '.';
 
 const HUMAN_FORMAT = `DD/MM/YY HH:mm`;
@@ -12,6 +13,7 @@ const Name = {
 };
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 export default class Dates {
   static addMinutes(minutes, dateInst = dayjs()) {
@@ -77,6 +79,10 @@ export default class Dates {
 
   static getTimestampDuration(dateInstA, dateInstB) {
     return dateInstA.unix() - dateInstB.unix();
+  }
+
+  static getUTC(dateInst) {
+    return dateInst.utc().format();
   }
 
   static humanize(date) {
