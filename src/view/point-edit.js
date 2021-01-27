@@ -435,7 +435,8 @@ export default class PointEditView extends SmartView {
 
     return Object.assign({}, data, {
       dateFrom: Dates.getInst(data.dateFrom, true),
-      dateTo: Dates.getInst(data.dateTo, true)
+      dateTo: Dates.getInst(data.dateTo, true),
+      basePrice: parseInt(data.basePrice, 10)
     });
   }
 

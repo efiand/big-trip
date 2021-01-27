@@ -32,10 +32,11 @@ const filterPoints = {
 };
 
 export default class TripPresenter {
-  constructor(tripContainer, pointsModel, filterModel) {
+  constructor(tripContainer, pointsModel, filterModel, api) {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
+    this._api = api;
     this._sortComponent = null;
     this._newButtonComponent = null;
     this._tabsComponent = null;
@@ -212,7 +213,9 @@ export default class TripPresenter {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update).then((res) => {
+          this._pointsModel.updatePoint(updateType, res);
+        });
         break;
       case UserAction.ADD_POINT:
         this._pointsModel.addPoint(updateType, update);

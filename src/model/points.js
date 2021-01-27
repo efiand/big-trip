@@ -1,4 +1,4 @@
-import {Dates, Observer, Utils, Random} from '../utils';
+import {Dates, Observer, Utils} from '../utils';
 
 export default class PointsModel extends Observer {
   constructor() {
@@ -126,7 +126,7 @@ export default class PointsModel extends Observer {
       'date_from': Dates.getUTC(point.dateFrom),
       'date_to': Dates.getUTC(point.dateTo),
       'is_favorite': point.isFavorite,
-      'offers': Utils.cloneDeep(point.offers)
+      'offers': Utils.cloneDeep(point.offers).filter((offer) => offer.isChecked)
     });
 
     delete adaptedPoint.basePrice;

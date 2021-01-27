@@ -3,7 +3,8 @@ import {Utils} from './utils';
 
 const Method = {
   GET: `GET`,
-  POST: `POST`
+  POST: `POST`,
+  PUT: `PUT`
 };
 
 const SuccessStatusRange = {
@@ -15,6 +16,7 @@ export default class Api {
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
+    this._pointTypes = [];
 
     this.getPoints = this.getPoints.bind(this);
   }
@@ -32,20 +34,21 @@ export default class Api {
           });
           return pointType;
         });
+        this._pointTypes = Utils.cloneDeep(pointTypes);
 
         return {pointTypes, destinations};
       })
       .catch(Api.catchError);
   }
 
-  getPoints(pointTypes) {
-    if (!pointTypes.length) {
+  getPoints() {
+    if (!this._pointTypes.length) {
       return Promise.reject;
     }
 
     return this._load({url: `points`})
       .then(Api.toJSON)
-      .then((points) => points.map((point) => PointsModel.adaptToClient(point, Utils.cloneDeep(pointTypes))))
+      .then((points) => points.map((point) => PointsModel.adaptToClient(point, Utils.cloneDeep(this._pointTypes))))
       .catch(Api.catchError);
   }
 
@@ -57,7 +60,8 @@ export default class Api {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(Api.toJSON)
-      .then();
+      .then((res) => PointsModel.adaptToClient(res, Utils.cloneDeep(this._pointTypes)))
+      .catch(Api.catchError);
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

@@ -1,5 +1,5 @@
 import PointEditView from '../view/point-edit';
-import {Render, Random} from '../utils';
+import {Render} from '../utils';
 import {RenderPosition, UserAction, UpdateType} from '../const';
 
 export default class PointNewPresenter {
