@@ -431,8 +431,6 @@ export default class PointEditView extends SmartView {
   }
 
   static parseDataToPoint(data) {
-    delete data.isNewPoint;
-
     return Object.assign({}, data, {
       dateFrom: Dates.getInst(data.dateFrom, true),
       dateTo: Dates.getInst(data.dateTo, true),

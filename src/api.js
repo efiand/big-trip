@@ -2,6 +2,7 @@ import PointsModel from './model/points';
 import {Utils} from './utils';
 
 const Method = {
+  DELETE: `DELETE`,
   GET: `GET`,
   POST: `POST`,
   PUT: `PUT`
@@ -19,6 +20,25 @@ export default class Api {
     this._pointTypes = [];
 
     this.getPoints = this.getPoints.bind(this);
+  }
+
+  addPoint(point) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(PointsModel.adaptToServer(point, true)),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(Api.toJSON)
+      .then((res) => PointsModel.adaptToClient(res, Utils.cloneDeep(this._pointTypes)))
+      .catch(Api.catchError);
+  }
+
+  deletePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
+      method: Method.DELETE
+    });
   }
 
   getAssets() {

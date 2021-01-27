@@ -120,12 +120,12 @@ export default class PointsModel extends Observer {
     return adaptedPoint;
   }
 
-  static adaptToServer(point) {
+  static adaptToServer(point, createMode = false) {
     const adaptedPoint = Object.assign({}, point, {
       'base_price': point.basePrice,
       'date_from': Dates.getUTC(point.dateFrom),
       'date_to': Dates.getUTC(point.dateTo),
-      'is_favorite': point.isFavorite,
+      'is_favorite': point.isFavorite || false,
       'offers': Utils.cloneDeep(point.offers).filter((offer) => offer.isChecked)
     });
 
@@ -136,6 +136,11 @@ export default class PointsModel extends Observer {
     adaptedPoint.offers.forEach((offer) => {
       delete offer.isChecked;
     });
+
+    if (createMode) {
+      delete adaptedPoint.id;
+      delete adaptedPoint.isNewPoint;
+    }
 
     return adaptedPoint;
   }
