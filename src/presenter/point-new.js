@@ -61,9 +61,7 @@ export default class PointNewPresenter {
   }
 
   _handleFormSubmit(point) {
-    this._changeData(UserAction.ADD_POINT, UpdateType.MAJOR, Object.assign({
-      id: Random.generateId()
-    }, point));
+    this._changeData(UserAction.ADD_POINT, UpdateType.MAJOR, Object.assign({}, point));
 
     this.destroy();
   }

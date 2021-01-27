@@ -23,7 +23,6 @@ const filterModel = new FilterModel();
 const pointsModel = new PointsModel();
 const newButtonComponent = new NewButtonView();
 const tabsComponent = new TabsView();
-const statsComponent = new StatsView();
 const infoPresenter = new InfoPresenter(tripHeaderElement, pointsModel);
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripMainElement, pointsModel, filterModel);
@@ -31,14 +30,16 @@ const tripPresenter = new TripPresenter(tripMainElement, pointsModel, filterMode
 Render.render(tripHeadingElement, tabsComponent, RenderPosition.AFTEREND);
 Render.render(tripHeaderElement, newButtonComponent);
 
+tripPresenter.init(newButtonComponent, tabsComponent, new StatsView());
 infoPresenter.init();
 filterPresenter.init();
-tripPresenter.init(newButtonComponent, tabsComponent, statsComponent);
 
-api.getData()
-  .then((data) => {
-    pointsModel.setData(UpdateType.INIT, data);
+api.getAssets()
+  .then(pointsModel.setAssets)
+  .then(api.getPoints, tripPresenter.stop)
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT, points);
+  }, () => {
+    pointsModel.setPoints(UpdateType.INIT, []);
   })
-  .catch(() => {
-    pointsModel.setData(UpdateType.INIT, {});
-  });
+  .catch(tripPresenter.stop);

@@ -1,4 +1,4 @@
-import {Dates, Observer, Utils} from '../utils';
+import {Dates, Observer, Utils, Random} from '../utils';
 
 export default class PointsModel extends Observer {
   constructor() {
@@ -9,6 +9,7 @@ export default class PointsModel extends Observer {
     this._destinations = [];
 
     this.getDefaultPoint = this.getDefaultPoint.bind(this);
+    this.setAssets = this.setAssets.bind(this);
   }
 
   get destinations() {
@@ -47,7 +48,7 @@ export default class PointsModel extends Observer {
     const dateFrom = Dates.getInst();
 
     return {
-      id: `new`, // для рендеринга связок инпутов и лейблов
+      id: Date.now() + parseInt(Math.random() * 10000, 10), // для рендеринга связок инпутов и лейблов, сохраняться не будет
       isNewPoint: true,
       type,
       destination: Utils.cloneDeep(this._destinations[0]),
@@ -62,12 +63,17 @@ export default class PointsModel extends Observer {
     return this._points;
   }
 
-  setData(updateType, {points = [], pointTypes = [], destinations = []}) {
-    this._points = points.slice();
+  setAssets({pointTypes, destinations}) {
     this._pointTypes = Utils.cloneDeep(pointTypes);
     this._destinations = Utils.cloneDeep(destinations);
 
-    this._notify(updateType);
+    return pointTypes;
+  }
+
+  setPoints(updateType, points) {
+    this._points = points.slice();
+
+    this._notify(updateType, null, this._notice);
   }
 
   updatePoint(updateType, update) {

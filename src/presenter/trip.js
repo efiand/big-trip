@@ -48,6 +48,7 @@ export default class TripPresenter {
     this._isDestroyed = true;
     this._isLoading = true;
 
+    this.stop = this.stop.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -80,6 +81,10 @@ export default class TripPresenter {
 
     this._tabsComponent.setClickHandler(this._handleTabsClick);
     Render.render(this._tripContainer, this._statsComponent, RenderPosition.AFTEREND);
+  }
+
+  stop() {
+    this._loadingConponent.getElement().textContent = `Error...`;
   }
 
   _clearSort() {
@@ -119,7 +124,6 @@ export default class TripPresenter {
 
     this._renderTrip();
 
-    this._statsComponent.hide();
     this._tabsComponent.setDefault();
     this._isDestroyed = false;
   }
@@ -128,6 +132,10 @@ export default class TripPresenter {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.DEFAULT);
     this._pointNewPresenter.init((pointNewComponent) => {
+      if (!this._pointsModel.getPoints().length) {
+        Render.remove(this._noPointsComponent);
+        this._renderList();
+      }
       this._newButtonComponent.getElement().disabled = pointNewComponent !== null;
       this._tabsComponent.setDefault();
     });
@@ -185,16 +193,17 @@ export default class TripPresenter {
 
     this._currentSortType = sortType;
     this._clearList();
-    this._renderPoints(this._getPoints().slice());
+    this._renderPoints(this._getPoints());
   }
 
   _handleTabsClick(activeTab) {
     switch (activeTab) {
       case Tabs.TABLE:
-        this._create();
+        this._tripContainer.hidden = false;
+        this._statsComponent.hide();
         break;
       case Tabs.STATS:
-        this._destroy();
+        this._tripContainer.hidden = true;
         this._statsComponent.show();
         break;
     }

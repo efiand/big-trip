@@ -15,16 +15,17 @@ export default class Api {
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
+
+    this.getPoints = this.getPoints.bind(this);
   }
 
-  getData() {
+  getAssets() {
     return Promise.all([
-      this._load({url: `points`}),
       this._load({url: `offers`}),
       this._load({url: `destinations`})
     ])
       .then((responses) => Promise.all(responses.map(Api.toJSON)))
-      .then(([points, offers, destinations]) => {
+      .then(([offers, destinations]) => {
         const pointTypes = offers.map((pointType) => {
           pointType.offers.forEach((offer) => {
             offer.isChecked = false;
@@ -32,12 +33,19 @@ export default class Api {
           return pointType;
         });
 
-        return {
-          points: points.map((point) => PointsModel.adaptToClient(point, Utils.cloneDeep(pointTypes))),
-          pointTypes,
-          destinations
-        };
+        return {pointTypes, destinations};
       })
+      .catch(Api.catchError);
+  }
+
+  getPoints(pointTypes) {
+    if (!pointTypes.length) {
+      return Promise.reject;
+    }
+
+    return this._load({url: `points`})
+      .then(Api.toJSON)
+      .then((points) => points.map((point) => PointsModel.adaptToClient(point, Utils.cloneDeep(pointTypes))))
       .catch(Api.catchError);
   }
 
