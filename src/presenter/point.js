@@ -8,6 +8,11 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`
+};
+
 export default class PointPresenter {
   constructor(pointsListContainer, changeData, changeMode, pointsModel) {
     this._pointsListContainer = pointsListContainer;
@@ -49,10 +54,14 @@ export default class PointPresenter {
       return;
     }
 
-    if (this._mode === Mode.DEFAULT) {
-      Render.replace(this._pointComponent, prevPointComponent);
-    } else if (this._mode === Mode.EDITING) {
-      Render.replace(this._pointEditComponent, prevPointEditComponent);
+    switch (this._mode) {
+      case Mode.DEFAULT:
+        Render.replace(this._pointComponent, prevPointComponent);
+        break;
+      case Mode.EDITING:
+        Render.replace(this._pointComponent, prevPointEditComponent);
+        this._mode = Mode.DEFAULT;
+        break;
     }
 
     Render.remove(prevPointComponent);
@@ -67,6 +76,23 @@ export default class PointPresenter {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._switchToView();
+    }
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
     }
   }
 
@@ -101,7 +127,6 @@ export default class PointPresenter {
     const updateType = isUpdatedDateFrom || isUpdatedDateTo ? UpdateType.MINOR : UpdateType.PATCH;
 
     this._changeData(UserAction.UPDATE_POINT, updateType, update);
-    this._switchToView();
   }
 
   _switchToEdit() {

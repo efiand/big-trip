@@ -15,6 +15,21 @@ export default class PointNewPresenter {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
+  destroy() {
+    if (this._pointEditComponent === null) {
+      return;
+    }
+
+    Render.remove(this._pointEditComponent);
+    this._pointEditComponent = null;
+
+    if (this._destroyCallback) {
+      this._destroyCallback(this._pointEditComponent);
+    }
+
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+  }
+
   init(callback) {
     if (this._pointEditComponent !== null) {
       return;
@@ -34,19 +49,11 @@ export default class PointNewPresenter {
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
-  destroy() {
-    if (this._pointEditComponent === null) {
-      return;
-    }
-
-    Render.remove(this._pointEditComponent);
-    this._pointEditComponent = null;
-
-    if (this._destroyCallback) {
-      this._destroyCallback(this._pointEditComponent);
-    }
-
-    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
   }
 
   _escKeyDownHandler(evt) {
@@ -62,7 +69,5 @@ export default class PointNewPresenter {
 
   _handleFormSubmit(point) {
     this._changeData(UserAction.ADD_POINT, UpdateType.MAJOR, Object.assign({}, point));
-
-    this.destroy();
   }
 }

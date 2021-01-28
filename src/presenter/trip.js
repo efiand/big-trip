@@ -2,7 +2,7 @@ import SortView from '../view/sort';
 import PointsListView from '../view/points-list';
 import NoPointsView from '../view/no-points';
 import LoadingView from '../view/loading';
-import PointPresenter from './point';
+import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
 import {Dates, Render} from '../utils';
 import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from '../const';
@@ -44,7 +44,7 @@ export default class TripPresenter {
     this._listComponent = new PointsListView();
     this._noPointsComponent = new NoPointsView();
     this._loadingConponent = new LoadingView();
-    this._pointPresenters = {};
+    this._pointPresenter = {};
     this._currentSortType = SortType.DEFAULT;
     this._isDestroyed = true;
     this._isLoading = true;
@@ -94,8 +94,8 @@ export default class TripPresenter {
   }
 
   _clearList() {
-    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
-    this._pointPresenters = {};
+    Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
+    this._pointPresenter = {};
 
     this._pointNewPresenter.destroy();
   }
@@ -159,13 +159,13 @@ export default class TripPresenter {
   _handleModeChange() {
     this._pointNewPresenter.destroy();
 
-    Object.values(this._pointPresenters).forEach((presenter) => presenter.resetView());
+    Object.values(this._pointPresenter).forEach((presenter) => presenter.resetView());
   }
 
   _handleModelEvent(updateType, data, notice) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._pointPresenters[data.id].init(data);
+        this._pointPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
         this._clearList();
@@ -213,16 +213,19 @@ export default class TripPresenter {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
         this._api.updatePoint(update).then((res) => {
           this._pointsModel.updatePoint(updateType, res);
         });
         break;
       case UserAction.ADD_POINT:
+        this._pointNewPresenter.setSaving();
         this._api.addPoint(update).then((res) => {
           this._pointsModel.addPoint(updateType, res);
         });
         break;
       case UserAction.DELETE_POINT:
+        this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
         this._api.deletePoint(update).then(() => {
           this._pointsModel.deletePoint(updateType, update);
         });
@@ -246,7 +249,7 @@ export default class TripPresenter {
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._listComponent, this._handleViewAction, this._handleModeChange, this._pointsModel);
     pointPresenter.init(point);
-    this._pointPresenters[point.id] = pointPresenter;
+    this._pointPresenter[point.id] = pointPresenter;
   }
 
   _renderPoints(points) {

@@ -10,8 +10,9 @@ const DATEPICKER_DEFAULTS = {
   [KEY_24_HR]: true
 };
 
-const createPointTypes = (typeName, pointTypes) => pointTypes.reduce((template, {type}) => {
+const createPointTypes = (typeName, pointTypes, isDisabled) => pointTypes.reduce((template, {type}) => {
   const checkedAttr = type === typeName ? `checked` : ``;
+
   return `
     ${template}
     <div class="event__type-item">
@@ -22,6 +23,7 @@ const createPointTypes = (typeName, pointTypes) => pointTypes.reduce((template, 
         name="event-type"
         value="${type}"
         ${checkedAttr}
+        ${isDisabled ? `disabled` : ``}
       />
       <label class="event__type-label event__type-label--${type}" for="event-type-${type}">
         ${Utils.capitalize(type)}
@@ -34,9 +36,8 @@ const createCitiesList = (destinations) => destinations.reduce((template, {name}
   return `${template}<option value="${name}"></option>`;
 }, ``);
 
-const createOffersList = (offers) => offers.reduce((template, offer, i) => {
+const createOffersList = (offers, isDisabled) => offers.reduce((template, offer, i) => {
   const {title, price: offerPrice, isChecked} = offer;
-  const checkedAttr = isChecked ? `checked` : ``;
 
   return `
     ${template}
@@ -47,7 +48,8 @@ const createOffersList = (offers) => offers.reduce((template, offer, i) => {
         type="checkbox"
         name="event-offer-${i}"
         data-offer-id="${i}"
-        ${checkedAttr}
+        ${isChecked ? `checked` : ``}
+        ${isDisabled ? `disabled` : ``}
       />
       <label class="event__offer-label" for="event-offer-${i}">
         <span class="event__offer-title">${title}</span>
@@ -70,10 +72,15 @@ const createPointEditTemplate = ({
   dateFrom,
   dateTo,
   basePrice,
-  offers
+  offers,
+  isDisabled,
+  isSaving,
+  isDeleting
 }, pointTypes, destinations) => {
   const {name: city, description, pictures} = destination;
-  const isSubmitDisabled = !city || !dateFrom || !dateTo || !basePrice;
+  const isSubmitDisabled = isDisabled || !city || !dateFrom || !dateTo || !basePrice;
+  const disabledAttr = isDisabled ? `disabled` : ``;
+  const deleteStr = isDeleting ? `Deleting...` : `Delete`;
 
   return `
     <li class="trip-events__item">
@@ -94,12 +101,13 @@ const createPointEditTemplate = ({
               class="event__type-toggle visually-hidden"
               id="event-type-toggle-${id}"
               type="checkbox"
+              ${disabledAttr}
             />
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointTypes(type, pointTypes)}
+                ${createPointTypes(type, pointTypes, isDisabled)}
               </fieldset>
             </div>
           </div>
@@ -115,6 +123,7 @@ const createPointEditTemplate = ({
               name="event-destination"
               value="${city}"
               list="destination-list-${id}"
+              ${disabledAttr}
             />
             <datalist id="destination-list-${id}">${createCitiesList(destinations)}</datalist>
           </div>
@@ -127,6 +136,7 @@ const createPointEditTemplate = ({
               type="text"
               name="event-start-time"
               value="${dateFrom}"
+              ${disabledAttr}
             />
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
@@ -136,6 +146,7 @@ const createPointEditTemplate = ({
               type="text"
               name="event-end-time"
               value="${dateTo}"
+              ${disabledAttr}
             />
           </div>
 
@@ -149,19 +160,24 @@ const createPointEditTemplate = ({
               id="event-price-${id}"
               type="text"
               name="event-price" value="${basePrice}"
+              ${disabledAttr}
             />
           </div>
 
           <button
             class="event__save-btn btn btn--blue"
             type="submit"
-            ${isSubmitDisabled ? `disabled` : ``}
-          >Save</button>
-          <button class="event__reset-btn" type="reset">
-            ${isNewPoint ? `Cancel` : `Delete`}
+            ${isSubmitDisabled ? `disabled` : ``}>
+            ${isSaving ? `Saving...` : `Save`}
+          </button>
+          <button
+            class="event__reset-btn"
+            type="reset"
+            ${disabledAttr}>
+            ${isNewPoint ? `Cancel` : deleteStr}
           </button>
           ${isNewPoint ? `` : `
-            <button class="event__rollup-btn" type="button">
+            <button class="event__rollup-btn" type="button" ${disabledAttr}>
               <span class="visually-hidden">Open event</span>
             </button>
           `}
@@ -169,7 +185,7 @@ const createPointEditTemplate = ({
         <section class="event__details">
           ${offers.length ? `<section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-            <div class="event__available-offers">${createOffersList(offers)}</div>
+            <div class="event__available-offers">${createOffersList(offers, isDisabled)}</div>
           </section>` : ``}
 
           ${description && pictures ? `<section class="event__section event__section--destination">
@@ -431,6 +447,10 @@ export default class PointEditView extends SmartView {
   }
 
   static parseDataToPoint(data) {
+    delete data.isDisabled;
+    delete data.isDeleting;
+    delete data.isSaving;
+
     return Object.assign({}, data, {
       dateFrom: Dates.getInst(data.dateFrom, true),
       dateTo: Dates.getInst(data.dateTo, true),
@@ -441,7 +461,10 @@ export default class PointEditView extends SmartView {
   static parsePointToData(point) {
     return Object.assign({}, point, {
       dateFrom: Dates.humanize(point.dateFrom),
-      dateTo: Dates.humanize(point.dateTo)
+      dateTo: Dates.humanize(point.dateTo),
+      isDisabled: false,
+      isDeleting: false,
+      isSaving: false
     });
   }
 }
