@@ -49,6 +49,18 @@ export default class PointNewPresenter {
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+  }
+
   setSaving() {
     this._pointEditComponent.updateData({
       isDisabled: true,
