@@ -43,3 +43,7 @@ api.getAssets()
     pointsModel.setPoints(UpdateType.INIT, []);
   })
   .catch(tripPresenter.stop);
+
+  window.addEventListener(`load`, () => {
+    navigator.serviceWorker.register(`./sw.js`);
+  });
