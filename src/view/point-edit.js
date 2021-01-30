@@ -3,11 +3,10 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart';
 import {Dates, Utils} from '../utils';
 
-const KEY_24_HR = `time_24hr`;
 const DATEPICKER_DEFAULTS = {
-  dateFormat: `d/m/y H:i`,
-  enableTime: true,
-  [KEY_24_HR]: true
+  'dateFormat': `d/m/y H:i`,
+  'enableTime': true,
+  'time_24hr': true
 };
 
 const createPointTypes = (typeName, pointTypes, isDisabled) => pointTypes.reduce((template, {type}) => {
