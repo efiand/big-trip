@@ -1,5 +1,5 @@
-import PointView from '../view/point';
-import PointEditView from '../view/point-edit';
+import PointView from '../view/point-view';
+import PointEditView from '../view/point-edit-view';
 import {Dates, Render, Utils} from '../utils';
 import {UserAction, UpdateType} from '../const';
 

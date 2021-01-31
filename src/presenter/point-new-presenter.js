@@ -1,4 +1,4 @@
-import PointEditView from '../view/point-edit';
+import PointEditView from '../view/point-edit-view';
 import {Render} from '../utils';
 import {RenderPosition, UserAction, UpdateType} from '../const';
 

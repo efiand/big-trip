@@ -1,4 +1,4 @@
-import FilterView from '../view/filter';
+import FilterView from '../view/filter-view';
 import {Render} from '../utils';
 import {UpdateType, FilterType} from '../const';
 
@@ -18,12 +18,12 @@ export default class FilterPresenter {
     this._pointsModel.addObserver(this._handleModelEvent);
   }
 
-  init(isDisabled = true) {
-    this._currentFilter = isDisabled ? FilterType.DEFAULT : this._filterModel.getFilter();
+  init() {
+    this._currentFilter = this._filterModel.getFilter();
 
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(this._currentFilter, isDisabled);
+    this._filterComponent = new FilterView(this._currentFilter, this._filterModel.count);
     this._filterComponent.setChangeFilterTypeHandler(this._handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -44,6 +44,6 @@ export default class FilterPresenter {
   }
 
   _handleModelEvent() {
-    this.init(!this._pointsModel.getPoints().length);
+    this.init();
   }
 }

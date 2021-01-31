@@ -1,9 +1,9 @@
-import SortView from '../view/sort';
-import PointsListView from '../view/points-list';
-import NoPointsView from '../view/no-points';
-import LoadingView from '../view/loading';
-import PointPresenter, {State as PointPresenterViewState} from './point';
-import PointNewPresenter from './point-new';
+import SortView from '../view/sort-view';
+import PointsListView from '../view/points-list-view';
+import NoPointsView from '../view/no-points-view';
+import LoadingView from '../view/loading-view';
+import PointPresenter, {State as PointPresenterViewState} from './point-presenter';
+import PointNewPresenter from './point-new-presenter';
 import {Dates, Render, Utils} from '../utils';
 import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from '../const';
 
@@ -36,6 +36,7 @@ export default class TripPresenter {
     this._tripContainer = tripContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
+    this._filterPresenter = null;
     this._api = api;
     this._sortComponent = null;
     this._newButtonComponent = null;
@@ -61,10 +62,11 @@ export default class TripPresenter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init(newButtonComponent, tabsComponent, statsComponent) {
+  init(newButtonComponent, tabsComponent, statsComponent, filterPresenter) {
     this._newButtonComponent = newButtonComponent;
     this._tabsComponent = tabsComponent;
     this._statsComponent = statsComponent;
+    this._filterPresenter = filterPresenter;
 
     statsComponent.updateData({
       points: this._pointsModel.getPoints()
@@ -189,6 +191,8 @@ export default class TripPresenter {
         break;
     }
 
+    this._setFiltersCount();
+
     if (notice && notice.points) {
       this._statsComponent.updateData(notice);
     }
@@ -294,5 +298,16 @@ export default class TripPresenter {
 
     this._renderSort();
     this._renderList();
+  }
+
+  _setFiltersCount() {
+    const points = this._pointsModel.getPoints();
+
+    this._filterModel.count = {
+      [FilterType.DEFAULT]: points.length,
+      [FilterType.FUTURE]: points.filter(filterPoints[FilterType.FUTURE]).length,
+      [FilterType.PAST]: points.filter(filterPoints[FilterType.PAST]).length
+    };
+    this._filterPresenter.init();
   }
 }

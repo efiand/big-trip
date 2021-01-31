@@ -51,11 +51,11 @@ export default class PointsModel extends Observer {
       id: Date.now() + parseInt(Math.random() * 10000, 10), // для рендеринга связок инпутов и лейблов, сохраняться не будет
       isNewPoint: true,
       type,
-      destination: Utils.cloneDeep(this._destinations[0]),
+      destination: Utils.cloneData(this._destinations[0]),
       dateFrom,
       dateTo: dateFrom,
       basePrice: ``,
-      offers: Utils.cloneDeep(offers)
+      offers: Utils.cloneData(offers)
     };
   }
 
@@ -64,8 +64,8 @@ export default class PointsModel extends Observer {
   }
 
   setAssets({pointTypes, destinations}) {
-    this._pointTypes = Utils.cloneDeep(pointTypes);
-    this._destinations = Utils.cloneDeep(destinations);
+    this._pointTypes = Utils.cloneData(pointTypes);
+    this._destinations = Utils.cloneData(destinations);
 
     return this._pointTypes;
   }
@@ -108,7 +108,7 @@ export default class PointsModel extends Observer {
       isFavorite: point.is_favorite,
       offers: pointType.offers.map((offer) => {
         offer.isChecked = point.offers.some((pointOffer) => pointOffer.title === offer.title);
-        return Utils.cloneDeep(offer);
+        return Utils.cloneData(offer);
       })
     });
 
@@ -126,7 +126,7 @@ export default class PointsModel extends Observer {
       'date_from': Dates.getUTC(point.dateFrom),
       'date_to': Dates.getUTC(point.dateTo),
       'is_favorite': point.isFavorite || false,
-      'offers': Utils.cloneDeep(point.offers).filter((offer) => offer.isChecked)
+      'offers': Utils.cloneData(point.offers).filter((offer) => offer.isChecked)
     });
 
     delete adaptedPoint.basePrice;

@@ -1,4 +1,4 @@
-import AbstractView from './abstract';
+import AbstractView from './abstract-view';
 import {Dates} from '../utils';
 
 const createInfoTemplate = (points) => {

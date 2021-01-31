@@ -6,6 +6,19 @@ export default class FilterModel extends Observer {
     super();
 
     this._currentFilter = FilterType.DEFAULT;
+    this._count = {
+      [FilterType.DEFAULT]: 0,
+      [FilterType.FUTURE]: 0,
+      [FilterType.PAST]: 0
+    };
+  }
+
+  get count() {
+    return this._count;
+  }
+
+  set count(countPoints) {
+    this._count = countPoints;
   }
 
   getFilter() {

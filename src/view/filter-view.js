@@ -1,8 +1,8 @@
-import AbstractView from './abstract';
+import AbstractView from './abstract-view';
 import {Utils} from '../utils';
 import {FilterType} from '../const';
 
-const createListMarkup = (currentFilter, isDisabled) => Object.values(FilterType).reduce((markup, filter) => {
+const createListMarkup = (currentFilter, count) => Object.values(FilterType).reduce((markup, filter) => {
   const title = Utils.capitalize(filter);
   const isActive = filter === currentFilter;
 
@@ -16,7 +16,7 @@ const createListMarkup = (currentFilter, isDisabled) => Object.values(FilterType
         name="trip-filter"
         value="${filter}"
         ${isActive ? `checked` : ``}
-        ${!isActive && isDisabled ? `disabled` : ``}
+        ${!isActive && !count[filter] ? `disabled` : ``}
       />
       <label class="trip-filters__filter-label" for="filter-${filter}">
         ${title}
@@ -25,21 +25,21 @@ const createListMarkup = (currentFilter, isDisabled) => Object.values(FilterType
   `;
 }, ``);
 
-const createFiltersTemplate = (currentFilter, isDisabled) => {
+const createFiltersTemplate = (currentFilter, count) => {
   return `
     <form class="trip-filters" action="#" method="get">
-      ${createListMarkup(currentFilter, isDisabled)}
+      ${createListMarkup(currentFilter, count)}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>
   `;
 };
 
 export default class FilterView extends AbstractView {
-  constructor(currentFilter, isDisabled) {
+  constructor(currentFilter, count) {
     super();
 
     this._currentFilter = currentFilter;
-    this._isDisabled = isDisabled;
+    this._count = count;
 
     this._changeFilterTypeHandler = this._changeFilterTypeHandler.bind(this);
   }
@@ -49,7 +49,7 @@ export default class FilterView extends AbstractView {
   }
 
   getTemplate() {
-    return createFiltersTemplate(this._currentFilter, this._isDisabled);
+    return createFiltersTemplate(this._currentFilter, this._count);
   }
 
   setChangeFilterTypeHandler(callback) {

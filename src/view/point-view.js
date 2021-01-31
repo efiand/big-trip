@@ -1,4 +1,4 @@
-import AbstractView from './abstract';
+import AbstractView from './abstract-view';
 import {Dates, Utils} from '../utils';
 
 const createOfferItem = (template, offer) => {

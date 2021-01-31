@@ -1,10 +1,15 @@
-import PointsModel from '../model/points';
+import PointsModel from '../model/points-model';
 import {Utils} from '../utils';
 
 export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
+    this._isNotSync = false;
+  }
+
+  get isNotSync() {
+    return this._isNotSync;
   }
 
   addPoint(point) {
@@ -75,6 +80,7 @@ export default class Provider {
           ]);
 
           this._store.setItems(items);
+          this._isNotSync = false;
         });
     }
 
@@ -91,6 +97,7 @@ export default class Provider {
     }
 
     this._store.setItem(point.id, PointsModel.adaptToServer(Object.assign({}, point)));
+    this._isNotSync = true;
     return Promise.resolve(point);
   }
 
@@ -103,6 +110,6 @@ export default class Provider {
   }
 
   static getSyncedPoints(items) {
-    return items.filter(({success}) => success).map((payload) => payload.point);
+    return items.filter(({success}) => success).map((item) => item.payload);
   }
 }

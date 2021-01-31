@@ -19,8 +19,8 @@ export default class Store {
 
   getPoints() {
     const storyData = this.getItems();
-    delete(storyData.pointTypes);
-    delete(storyData.destinations);
+    delete storyData.pointTypes;
+    delete storyData.destinations;
     return storyData;
   }
 

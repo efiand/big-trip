@@ -1,4 +1,4 @@
-import InfoView from '../view/info';
+import InfoView from '../view/info-view';
 import {Render} from '../utils';
 import {RenderPosition} from '../const';
 

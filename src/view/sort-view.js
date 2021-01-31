@@ -1,4 +1,4 @@
-import AbstractView from './abstract';
+import AbstractView from './abstract-view';
 import {Utils} from '../utils';
 import {SortType} from '../const';
 

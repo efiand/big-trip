@@ -1,4 +1,4 @@
-import AbstractView from '../view/abstract';
+import AbstractView from '../view/abstract-view';
 import {RenderPosition} from '../const';
 
 export default class Render {

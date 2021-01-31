@@ -1,6 +1,6 @@
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import SmartView from './smart';
+import SmartView from './smart-view';
 import {Dates} from '../utils';
 
 const BAR_HEIGHT = 55;

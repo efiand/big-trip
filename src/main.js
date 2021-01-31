@@ -1,11 +1,11 @@
-import NewButtonView from './view/new-button';
-import TabsView from './view/tabs';
-import StatsView from './view/stats';
-import InfoPresenter from './presenter/info';
-import FilterPresenter from './presenter/filter';
-import TripPresenter from './presenter/trip';
-import FilterModel from './model/filter';
-import PointsModel from './model/points';
+import NewButtonView from './view/new-button-view';
+import TabsView from './view/tabs-view';
+import StatsView from './view/stats-view';
+import InfoPresenter from './presenter/info-presenter';
+import FilterPresenter from './presenter/filter-presenter';
+import TripPresenter from './presenter/trip-presenter';
+import FilterModel from './model/filter-model';
+import PointsModel from './model/points-model';
 import Api from './api/api';
 import Store from './api/store';
 import Provider from './api/provider';
@@ -38,7 +38,7 @@ const tripPresenter = new TripPresenter(tripMainElement, pointsModel, filterMode
 Render.render(tripHeadingElement, tabsComponent, RenderPosition.AFTEREND);
 Render.render(tripHeaderElement, newButtonComponent);
 
-tripPresenter.init(newButtonComponent, tabsComponent, new StatsView());
+tripPresenter.init(newButtonComponent, tabsComponent, new StatsView(), filterPresenter);
 infoPresenter.init();
 filterPresenter.init();
 
@@ -52,10 +52,11 @@ apiWithProvider.getAssets()
     apiWithProvider.getPoints()
       .then((points) => {
         pointsModel.setPoints(UpdateType.INIT, points);
+        filterPresenter.init();
       }, () => {
         pointsModel.setPoints(UpdateType.INIT, []);
       });
-    })
+  })
   .catch(tripPresenter.stop);
 
 window.addEventListener(`load`, () => {
@@ -64,7 +65,9 @@ window.addEventListener(`load`, () => {
 
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
-  apiWithProvider.sync();
+  if (apiWithProvider.isNotSync) {
+    apiWithProvider.sync();
+  }
 });
 
 window.addEventListener(`offline`, () => {

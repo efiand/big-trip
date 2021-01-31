@@ -13,7 +13,7 @@ export default class Utils {
     return str.slice(0, 1).toUpperCase() + str.slice(1);
   }
 
-  static cloneDeep(data) {
+  static cloneData(data) {
     return JSON.parse(JSON.stringify(data));
   }
 
