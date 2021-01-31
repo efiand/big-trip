@@ -67,7 +67,7 @@ export default class PointsModel extends Observer {
     this._pointTypes = Utils.cloneDeep(pointTypes);
     this._destinations = Utils.cloneDeep(destinations);
 
-    return pointTypes;
+    return this._pointTypes;
   }
 
   setPoints(updateType, points) {

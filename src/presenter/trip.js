@@ -4,7 +4,7 @@ import NoPointsView from '../view/no-points';
 import LoadingView from '../view/loading';
 import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
-import {Dates, Render} from '../utils';
+import {Dates, Render, Utils} from '../utils';
 import {FilterType, RenderPosition, SortType, Tabs, UpdateType, UserAction} from '../const';
 
 const sortPoints = {
@@ -71,8 +71,14 @@ export default class TripPresenter {
     });
 
     this._newButtonComponent.setClickHandler(() => {
-      this._createPoint();
       this._tabsComponent.setDefault();
+
+      if (!Utils.isOnline()) {
+        Utils.toast(`You can't create new point offline`);
+        return;
+      }
+
+      this._createPoint();
       if (this._isDestroyed) {
         this._create();
       }
@@ -84,8 +90,9 @@ export default class TripPresenter {
     Render.render(this._tripContainer, this._statsComponent, RenderPosition.AFTEREND);
   }
 
-  stop() {
+  stop(err) {
     this._loadingConponent.getElement().textContent = `Error...`;
+    throw err;
   }
 
   _clearSort() {

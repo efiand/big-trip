@@ -1,6 +1,6 @@
 import PointView from '../view/point';
 import PointEditView from '../view/point-edit';
-import {Render, Dates} from '../utils';
+import {Dates, Render, Utils} from '../utils';
 import {UserAction, UpdateType} from '../const';
 
 const Mode = {
@@ -121,10 +121,20 @@ export default class PointPresenter {
   }
 
   _handleDeleteClick() {
+    if (!Utils.isOnline()) {
+      Utils.toast(`You can't delete point offline`);
+      return;
+    }
+
     this._changeData(UserAction.DELETE_POINT, UpdateType.MAJOR, this._point);
   }
 
   _handleEditClick() {
+    if (!Utils.isOnline()) {
+      Utils.toast(`You can't edit point offline`);
+      return;
+    }
+
     this._switchToEdit();
   }
 
@@ -134,6 +144,11 @@ export default class PointPresenter {
   }
 
   _handleFormSubmit(update) {
+    if (!Utils.isOnline()) {
+      Utils.toast(`You can't save point offline`);
+      return;
+    }
+
     // Проверяем, изменились ли данные, которые попадают под фильтрацию
     const isUpdatedDateFrom = !Dates.isEqual(this._point.dateFrom, update.dateFrom);
     const isUpdatedDateTo = !Dates.isEqual(this._point.dateFrom, update.dateTo);
